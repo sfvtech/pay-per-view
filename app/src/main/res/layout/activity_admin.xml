@@ -1,0 +1,92 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.nullhammer.android.viewersurvey.AdminActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <TextView
+            style="@style/TitleText"
+            android:id="@+id/admin_title"
+            android:text="@string/title_activity_admin" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout2">
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/admin_restart_button"
+            android:id="@+id/adminRestartButton"
+            android:onClick="handleRestart"
+            android:layout_height="wrap_content" />
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/admin_quit_button"
+            android:id="@+id/adminQuitButton"
+            android:onClick="handleQuit"
+            android:layout_height="wrap_content"
+            android:enabled="false" />
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/admin_upload_button"
+            android:id="@+id/adminUploadButton"
+            android:onClick="handleUpload"
+            android:layout_height="wrap_content" />
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/admin_cancel_button"
+            android:id="@+id/adminCancelButton"
+            android:onClick="handleCancel"
+            android:layout_marginTop="60dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TableLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="true"
+        android:paddingBottom="5dp"
+        android:layout_marginLeft="25dp">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <TextView
+                android:id="@+id/installationIdLabel"
+                android:text="@string/installationIdLabel"
+                android:paddingRight="5dp"
+                android:paddingLeft="0dp" />
+            <TextView
+                android:id="@+id/installationIdValue"
+                android:text="@string/installationIdValue" />
+        </TableRow>
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <TextView
+                android:id="@+id/versionLabel"
+                android:text="@string/versionLabel"
+                android:paddingRight="5dp"
+                android:paddingLeft="0dp" />
+            <TextView
+                android:id="@+id/versionValue"
+                android:text="@string/versionValue" />
+        </TableRow>
+    </TableLayout>
+
+</RelativeLayout>

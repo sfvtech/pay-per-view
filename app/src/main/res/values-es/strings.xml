@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ViewerNumberActivity -->
+    <string name="viewer_number_question">¿Cuántos espectadores están aquí?</string>
+    <string name="language_selector_label">English</string>
+    <string name="language_selector_value">en_US</string>
+
+    <!-- ViewerInfoActivity -->
+    <string name="viewer_info_salutation">Espectador</string>
+    <string name="viewer_info_question"> por favor dinos acerca de ti mismo.</string>
+    <string name="name">Primer Nombre</string>
+    <string name="email">Email</string>
+    <string name="okButton">OK</string>
+    <string name="done">Completado</string>
+    <string name="pattern_name">[A-Za-zÁÉÍÓÚáéíóuñÑ ]+</string>
+    <string name="message_required">Este campo es requerido</string>
+    <string name="message_name_too_short">Introduzca al menos dos caracteres.</string>
+    <string name="message_invalid_name">Nombre inválido</string>
+    <string name="message_invalid_email">Email inválido</string>
+
+    <!-- VideoActivity -->
+    <string name="video_description">Un breve video educativo.</string>
+
+    <!-- SurveyActivity -->
+    <string name="survey_salutation">Espectador</string>
+    <string name="survey_question">%1$s, va a ayudar a poner fin a esta crueldad? ¿Cuántos días a la semana se puede comprometer a comer comidas sin animales?</string>
+    <string name="survey_option_one_label">0</string>
+    <string name="survey_option_one_value">none</string>
+    <string name="survey_option_two_label">1-2</string>
+    <string name="survey_option_two_value">1-2</string>
+    <string name="survey_option_three_label">3-4</string>
+    <string name="survey_option_three_value">3-4</string>
+    <string name="survey_option_four_label">5-6</string>
+    <string name="survey_option_four_value">5-6</string>
+    <string name="survey_option_five_label">7</string>
+    <string name="survey_option_five_value">all</string>
+
+    <!-- ThankYouActivity -->
+    <string name="thank_you_title">Gracias! Ha terminado.</string>
+    <string name="thank_you_message">Encuentre un voluntario para recoger el $1.</string>
+
+
+</resources>

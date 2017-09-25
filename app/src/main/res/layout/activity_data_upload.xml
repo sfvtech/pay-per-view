@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.nullhammer.android.viewersurvey.AdminActivity" >
+
+    <TextView
+        style="@style/TitleText"
+        android:id="@+id/title_data_upload"
+        android:text="@string/data_upload_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentTop="true" />
+
+    <TableLayout
+        android:layout_width="500dp"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:layout_centerInParent="true">
+
+        <TableRow>
+            <TextView style="@style/TableCell"
+                android:layout_column="1"
+                android:text="@string/records_to_upload_label" />
+            <TextView style="@style/TableCell"
+                android:id="@+id/records_to_upload_value"
+                android:text="@string/records_to_upload_value" />
+        </TableRow>
+        <TableRow>
+            <TextView style="@style/TableCell"
+                android:layout_column="1"
+                android:text="@string/network_status_label" />
+            <TextView style="@style/TableCell"
+                android:id="@+id/network_status_value"
+                android:text="@string/network_status_offline" />
+        </TableRow>
+        <TableRow>
+            <TextView style="@style/TableCell"
+                android:layout_column="1"
+                android:text="@string/server_status_label" />
+            <TextView style="@style/TableCell"
+                android:id="@+id/server_status_value"
+                android:text="@string/server_status_offline" />
+        </TableRow>
+
+    </TableLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/upload_button"
+            android:id="@+id/uploadButton"
+            android:onClick="uploadData"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+        <Button
+            style="@style/AdminButton"
+            android:text="@string/admin_cancel_button"
+            android:id="@+id/adminCancelButton"
+            android:onClick="handleCancel"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+    </LinearLayout>
+
+</RelativeLayout>

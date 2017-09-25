@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">ViewerSurvey</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="title_activity_viewer_number" translatable="false">ViewerNumberActivity</string>
+    <string name="title_activity_video" translatable="false">VideoActivity</string>
+    <string name="title_activity_survey" translatable="false">SurveyActivity</string>
+    <string name="title_activity_thank_you" translatable="false">ThankYouActivity</string>
+    <string name="title_activity_admin" translatable="false">Admin Menu</string>
+
+    <!-- ViewerNumberActivity -->
+    <string name="viewer_number_question">How many viewers are here?</string>
+    <string name="language_selector_label">Español</string>
+    <string name="language_selector_value">es_US</string>
+
+    <!-- ViewerInfoActivity -->
+    <string name="viewer_info_salutation">Viewer</string>
+    <string name="viewer_info_question"> please tell us about yourself.</string>
+    <string name="name">First Name</string>
+    <string name="email">Email</string>
+    <string name="okButton">OK</string>
+    <string name="done">Done</string>
+    <string name="pattern_name">[A-Za-z ]+</string>
+    <string name="message_required">This field is required</string>
+    <string name="message_name_too_short">Enter at least 2 characters</string>
+    <string name="message_invalid_name">Invalid name</string>
+    <string name="message_invalid_email">Invalid email</string>
+
+    <!-- VideoActivity -->
+    <string name="video_description">A brief educational video.</string>
+
+    <!-- SurveyActivity -->
+    <string name="survey_salutation">Viewer</string>
+    <string name="survey_question">%1$s, will you help to end this cruelty? How many days a week can you pledge to eat animal-free meals?</string>
+    <string name="survey_option_one_label">0</string>
+    <string name="survey_option_one_value">none</string>
+    <string name="survey_option_two_label">1-2</string>
+    <string name="survey_option_two_value">1-2</string>
+    <string name="survey_option_three_label">3-4</string>
+    <string name="survey_option_three_value">3-4</string>
+    <string name="survey_option_four_label">5-6</string>
+    <string name="survey_option_four_value">5-6</string>
+    <string name="survey_option_five_label">7</string>
+    <string name="survey_option_five_value">all</string>
+
+    <!-- ThankYouActivity -->
+    <string name="thank_you_title">Thank you! You are done.</string>
+    <string name="thank_you_message">Please find a volunteer to collect your $1.</string>
+
+    <!-- AdminActivity -->
+    <string name="admin_restart_button" translatable="false">Restart Session</string>
+    <string name="admin_quit_button" translatable="false">Quit</string>
+    <string name="admin_upload_button" translatable="false">Upload Data</string>
+    <string name="admin_cancel_button" translatable="false">Cancel</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="title_activity_data_upload" translatable="false">DataUploadActivity</string>
+    <string name="admin_label_app_version" translatable="false">Version</string>
+    <string name="admin_label_installation_id" translatable="false">Installation id</string>
+
+    <!-- Upload Data Activity -->
+    <string name="data_upload_title" translatable="false">Admin Menu: Upload Data</string>
+    <string name="records_to_upload_label" translatable="false">Records to upload</string>
+    <string name="records_to_upload_value" translatable="false">0</string>
+    <string name="network_status_label" translatable="false">Network status</string>
+    <string name="network_status_offline" translatable="false">Offline</string>
+    <string name="network_status_online" translatable="false">Online</string>
+    <string name="server_status_label" translatable="false">Server status</string>
+    <string name="server_status_offline" translatable="false">Offline</string>
+    <string name="server_status_online" translatable="false">Online</string>
+    <string name="upload_button" translatable="false">Upload</string>
+
+    <string name="upload_endpoint_url" translatable="false">UPLOAD_ENPOINT_URL</string>
+    <string name="secret_key" translatable="false">SECRET_KEY</string>
+    <string name="secret_value" translatable="false">SECRET_VALUE</string>
+    <string name="installationIdLabel" translatable="false">Installation Id</string>
+    <string name="installationIdValue" translatable="false">None</string>
+    <string name="versionLabel" translatable="false">Version</string>
+    <string name="versionValue" translatable="false">0.0</string>
+
+
+</resources>
