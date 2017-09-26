@@ -1,4 +1,4 @@
-package com.sfvtech.payperview;
+package com.sfvtech.payperview.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -6,10 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
-
     public static final String DATABASE_NAME = "viewer_survey.db";
     public static final String LOG_TAG = "DatabaseHelper";
+    private static final int DATABASE_VERSION = 3;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

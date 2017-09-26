@@ -1,6 +1,5 @@
-package com.sfvtech.payperview;
+package com.sfvtech.payperview.admin;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -8,6 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import com.sfvtech.payperview.DataUploadActivity;
+import com.sfvtech.payperview.Installation;
+import com.sfvtech.payperview.MainActivity;
+import com.sfvtech.payperview.R;
+import com.sfvtech.payperview.ViewerSurvey;
 
 public class AdminActivity extends Activity {
 
@@ -34,10 +39,6 @@ public class AdminActivity extends Activity {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.toString());
         }
-
-        // Hide the Action Bar
-        ActionBar actionBar = getActionBar();
-        actionBar.hide();
     }
 
     public void handleUpload(View view) {
@@ -51,7 +52,7 @@ public class AdminActivity extends Activity {
         finish();
 
         // Return to the first activity
-        Intent intent = new Intent(this, ViewerNumberActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 

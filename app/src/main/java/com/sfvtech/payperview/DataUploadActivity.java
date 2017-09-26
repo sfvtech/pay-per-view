@@ -1,6 +1,5 @@
 package com.sfvtech.payperview;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,6 +21,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sfvtech.payperview.admin.AdminActivity;
+import com.sfvtech.payperview.database.DatabaseContract;
+import com.sfvtech.payperview.database.DatabaseHelper;
+
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -39,10 +42,6 @@ public class DataUploadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Full screen
-        ActionBar actionBar = getActionBar();
-        actionBar.hide();
 
         setContentView(R.layout.activity_data_upload);
 
@@ -189,6 +188,35 @@ public class DataUploadActivity extends Activity {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
+    /**
+     * Updates the "number of records to update" counter
+     */
+    protected void updateRecordsToUploadView() {
+
+        TextView recordsToUploadView = (TextView) findViewById(R.id.records_to_upload_value);
+        mRecordsToUpload = getNewRecordCount();
+        recordsToUploadView.setText(Long.toString(mRecordsToUpload));
+    }
+
+    public void handleCancel(View view) {
+        finish();
+    }
+
+    /**
+     * @return Integer the version number of the application
+     */
+    public int getApplicationVersionNumber() {
+        PackageInfo info;
+        try {
+            PackageManager manager = getApplication().getPackageManager();
+            info = manager.getPackageInfo(
+                    getApplication().getPackageName(), 0);
+            return info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
+
     private class CheckServerStatus extends AsyncTask<String, Void, Boolean> {
 
         @Override
@@ -310,35 +338,6 @@ public class DataUploadActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... values) {
-        }
-    }
-
-    /**
-     * Updates the "number of records to update" counter
-     */
-    protected void updateRecordsToUploadView() {
-
-        TextView recordsToUploadView = (TextView) findViewById(R.id.records_to_upload_value);
-        mRecordsToUpload = getNewRecordCount();
-        recordsToUploadView.setText(Long.toString(mRecordsToUpload));
-    }
-
-    public void handleCancel(View view) {
-        finish();
-    }
-
-    /**
-     * @return Integer the version number of the application
-     */
-    public int getApplicationVersionNumber() {
-        PackageInfo info;
-        try {
-            PackageManager manager = getApplication().getPackageManager();
-            info = manager.getPackageInfo(
-                    getApplication().getPackageName(), 0);
-            return info.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            return 0;
         }
     }
 }

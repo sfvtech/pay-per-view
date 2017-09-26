@@ -5,8 +5,8 @@
 
     <SurfaceView
         android:id="@+id/video_surface"
-        android:contentDescription="@string/video_description"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/video_description"
         android:scaleType="centerInside" />
 </RelativeLayout>

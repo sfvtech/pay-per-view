@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/my_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/survey_title"
+        style="@style/TitleText"
+        android:text="@string/survey_question" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/survey_options"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <Button
+            android:id="@+id/survey_option_one"
+            style="@style/SurveyOption"
+            android:layout_weight="1"
+            android:background="@drawable/button_med_deselected"
+            android:text="@string/survey_option_one_label" />
+
+        <Button
+            android:id="@+id/survey_option_two"
+            style="@style/SurveyOption"
+            android:layout_weight="1"
+            android:background="@drawable/button_med_deselected"
+            android:text="@string/survey_option_two_label" />
+
+        <Button
+            android:id="@+id/survey_option_three"
+            style="@style/SurveyOption"
+            android:layout_weight="1"
+            android:background="@drawable/button_med_deselected"
+            android:text="@string/survey_option_three_label" />
+
+        <Button
+            android:id="@+id/survey_option_four"
+            style="@style/SurveyOption"
+            android:layout_weight="1"
+            android:background="@drawable/button_med_deselected"
+            android:text="@string/survey_option_four_label" />
+
+        <Button
+            android:id="@+id/survey_option_five"
+            style="@style/SurveyOption"
+            android:layout_weight="1"
+            android:background="@drawable/button_med_deselected"
+            android:text="@string/survey_option_five_label" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/okButton"
+        style="@style/okButton"
+        android:background="@drawable/button_sm_deselected"
+        android:text="@string/okButton" />
+
+</LinearLayout>

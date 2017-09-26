@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="false"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/viewer_number_question"
+        style="@style/TitleText"
+        android:text="@string/viewers_still_here_question" />
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/addNew"
+            style="@style/okButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:padding="16dp"
+            android:text="@string/add_new_viewer" />
+
+        <Button
+            android:id="@+id/restartButton"
+            style="@style/okButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:padding="16dp"
+            android:text="@string/restart_from_viewers" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/confirm"
+        style="@style/okButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:padding="16dp"
+        android:text="@string/confirm" />
+</LinearLayout>

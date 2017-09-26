@@ -4,6 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.sfvtech.payperview"
         minSdkVersion 19
         targetSdkVersion 26
@@ -27,5 +28,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.mobsandgeeks:android-saripaar:1.0.3'
+    compile 'com.android.support:support-v4:26.+'
     testCompile 'junit:junit:4.12'
 }
