@@ -15,11 +15,11 @@ public class Session {
         mEndTime = time;
     }
 
-    public void setId(long id) {
-        mSessionId = id;
-    }
-
     public long getId() {
         return mSessionId;
+    }
+
+    public void setId(long id) {
+        mSessionId = id;
     }
 }

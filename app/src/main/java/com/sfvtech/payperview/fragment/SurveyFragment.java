@@ -1,66 +1,100 @@
-package com.sfvtech.payperview;
+package com.sfvtech.payperview.fragment;
 
-import android.app.ActionBar;
-import android.app.Activity;
+
 import android.content.ContentValues;
-import android.content.Intent;
+import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.sfvtech.payperview.R;
+import com.sfvtech.payperview.ViewHelper;
+import com.sfvtech.payperview.Viewer;
+import com.sfvtech.payperview.database.DatabaseContract;
+import com.sfvtech.payperview.database.DatabaseHelper;
 
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 
-public class SurveyActivity extends Activity {
 
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class SurveyFragment extends Fragment implements View.OnClickListener {
+
+    public static final String LOG_TAG = "SurveyFragment";
+    SurveyFragment.OnSurveyFinishedListener mCallback;
     private List<Viewer> mViewers;
     private ListIterator<Viewer> mViewersIterator;
     private Viewer mCurrentViewer;
-
-    private RelativeLayout mLayout;
+    private LinearLayout mLayout;
     private TextView mSurveyTitle;
+    private Button okButton;
+    private Button surveyOption1;
+    private Button surveyOption2;
+    private Button surveyOption3;
+    private Button surveyOption4;
+    private Button surveyOption5;
 
-    public static final String LOG_TAG = "ViewerSurveyActivity";
+    public SurveyFragment() {
+        // Required empty public constructor
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_survey, container, false);
 
-        // Full screen
-        ActionBar actionBar = getActionBar();
-        actionBar.hide();
-
-        LayoutInflater inflater = (LayoutInflater) getSystemService(this.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.activity_survey, null);
-        setContentView(layout);
-
-        // Extras
-        mViewers = (List<Viewer>) getIntent()
-                .getExtras()
-                .getSerializable(ViewerInfoActivity.EXTRA_VIEWERS);
+        mViewers = getArguments().getParcelableArrayList("mViewers");
 
         // UI references
-        mLayout = (RelativeLayout) findViewById(R.id.my_layout);
-        mSurveyTitle = (TextView) findViewById(R.id.survey_title);
+        mLayout = (LinearLayout) v.findViewById(R.id.my_layout);
+        mSurveyTitle = (TextView) v.findViewById(R.id.survey_title);
+        okButton = (Button) v.findViewById(R.id.okButton);
+        okButton.setOnClickListener(this);
+        surveyOption1 = (Button) v.findViewById(R.id.survey_option_one);
+        surveyOption1.setOnClickListener(this);
+        surveyOption2 = (Button) v.findViewById(R.id.survey_option_two);
+        surveyOption2.setOnClickListener(this);
+        surveyOption3 = (Button) v.findViewById(R.id.survey_option_three);
+        surveyOption3.setOnClickListener(this);
+        surveyOption4 = (Button) v.findViewById(R.id.survey_option_four);
+        surveyOption4.setOnClickListener(this);
+        surveyOption5 = (Button) v.findViewById(R.id.survey_option_five);
+        surveyOption5.setOnClickListener(this);
 
         // Start iteration
         mViewersIterator = mViewers.listIterator(0);
         incrementViewer();
 
         // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(layout);
+        ViewHelper.addMagicMenuButtons(v);
+
+        return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (SurveyFragment.OnSurveyFinishedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnSurveyFinishedListener");
+        }
     }
 
     private void incrementViewer() {
-
         mLayout.requestFocus();
         mCurrentViewer = mViewersIterator.next();
 
@@ -71,7 +105,8 @@ public class SurveyActivity extends Activity {
         deselectAllButtons();
     }
 
-    public void onSurveyButtonClicked(View view) {
+    @Override
+    public void onClick(View view) {
         String choice = "";
         deselectAllButtons();
         view.setBackgroundResource(R.drawable.button_med_selected);
@@ -93,28 +128,27 @@ public class SurveyActivity extends Activity {
             case R.id.survey_option_five:
                 choice = getString(R.string.survey_option_five_value);
                 break;
+            case R.id.okButton:
+                view.setBackgroundResource(R.drawable.button_sm_selected);
+
+                // Make sure the current viewer has submitted an answer
+                if ((mCurrentViewer).getSurveyAnswer() == null) {
+                    view.setBackgroundResource(R.drawable.button_sm_deselected);
+                    return;
+                }
+
+                saveCurrentViewer();
+
+                if (mViewersIterator.hasNext()) {
+                    incrementViewer();
+                } else {
+                    // Get the session id from the current viewer
+                    saveSession(mCurrentViewer.getSessionId());
+                    mCallback.onSurveyFinished();
+                }
+                break;
         }
         mCurrentViewer.setSurveyAnswer(choice);
-    }
-
-    public void okButtonHandler(View view) {
-        view.setBackgroundResource(R.drawable.button_sm_selected);
-
-        // Make sure the current viewer has submitted an answer
-        if ((mCurrentViewer).getSurveyAnswer() == null) {
-            view.setBackgroundResource(R.drawable.button_sm_deselected);
-            return;
-        }
-
-        saveCurrentViewer();
-
-        if (mViewersIterator.hasNext()) {
-            incrementViewer();
-        } else {
-            // Get the session id from the current viewer
-            saveSession(mCurrentViewer.getSessionId());
-            goToThankYouActivity();
-        }
     }
 
     // @todo move this into the Session model
@@ -122,7 +156,7 @@ public class SurveyActivity extends Activity {
 
         // Finalize the session session
         // @todo move getWritableDatabase() into AsyncTask
-        SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
+        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
         // End time values
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.SessionEntry.COLUMN_END_TIME, new Date().toString());
@@ -144,7 +178,7 @@ public class SurveyActivity extends Activity {
     private void saveCurrentViewer() {
         // Save the current viewer to the db
         // @todo move getWritableDatabase() into AsyncTask
-        SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
+        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.ViewerEntry.COLUMN_NAME, mCurrentViewer.getName());
@@ -173,15 +207,12 @@ public class SurveyActivity extends Activity {
                 v.setBackgroundResource(R.drawable.button_med_deselected);
             }
         }
-        findViewById(R.id.okButton).setBackgroundResource(R.drawable.button_sm_deselected);
+        okButton.setBackgroundResource(R.drawable.button_sm_deselected);
     }
 
-    private void goToThankYouActivity() {
-
-        Intent intent = new Intent(this, ThankYouActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-        overridePendingTransition(0, 0);
-        finish();
+    // Container Activity must implement this interface
+    public interface OnSurveyFinishedListener {
+        void onSurveyFinished();
     }
+
 }

@@ -14,8 +14,8 @@ import java.util.UUID;
  * @link http://android-developers.blogspot.com/2011/03/identifying-app-installations.html
  */
 public class Installation {
-    private static String sID = null;
     private static final String INSTALLATION = "INSTALLATION";
+    private static String sID = null;
 
     public synchronized static String getId(Context context) {
         if (sID == null) {

@@ -1,25 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.nullhammer.android.viewersurvey.ViewerNumberActivity" >
+    tools:context="com.sfvtech.payperview.ViewerInfoActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
+
         <TextView
             style="@style/TitleText"
             android:text="@string/thank_you_title" />
+
         <TextView
             style="@style/TitleText"
-            android:text="@string/thank_you_message"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:text="@string/thank_you_message" />
+
         <ImageView
-            android:layout_height="wrap_content"
             android:layout_width="300dp"
-            android:src="@drawable/thank_you_image"
-            android:layout_gravity="center_horizontal" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/thank_you_image" />
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

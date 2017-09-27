@@ -1,16 +1,16 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:windowAnimationStyle">@null</item>
-        <!-- Customize your theme here. -->
     </style>
+
     <style name="TitleText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">32dp</item>
-        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginStart">32dp</item>
         <item name="android:textSize">62sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -31,11 +31,11 @@
         <item name="android:background">@drawable/button_lg_deselected</item>
     </style>
     <style name="SurveyOption">
-        <item name="android:textSize">62sp</item>
+        <item name="android:textSize">58sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:padding">30dp</item>
-        <item name="android:layout_marginLeft">30dp</item>
-        <item name="android:layout_marginRight">30dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
         <item name="android:layout_width">180dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/button_med_deselected</item>
