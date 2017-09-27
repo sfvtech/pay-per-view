@@ -9,36 +9,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
-import com.sfvtech.payperview.Installation;
+import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
-import com.sfvtech.payperview.ViewHelper;
-import com.sfvtech.payperview.ViewerSurvey;
 
 import java.util.Locale;
 
 
 public class ViewerNumberFragment extends Fragment implements View.OnClickListener {
     public static final String FRAGMENT_TAG = "viewer-number";
-    public static final String EXTRA_N_VIEWERS = ViewerSurvey.PACKAGE + "EXTRA_N_VIEWERS";
 
     Button mOneButton;
     Button mTwoButton;
     Button mThreeButton;
-
     Button mLanguageSelector;
-
     OnViewerNumberSelectedListener mCallback;
+    private int MAX_VIEWERS;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_viewer_number, container, false);
 
-        // Trigger creation of unique installation id
-        // TODO better ID
-        String installationId = new Installation().getId(getContext());
+        String installationId = MainActivity.ID;
+        LinearLayout buttonLayout = (LinearLayout) view.findViewById(R.id.buttonLayout);
 
         // UI References
         mOneButton = (Button) view.findViewById(R.id.oneButton);
@@ -57,9 +52,6 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
                 toggleLanguage((String) v.getTag());
             }
         });
-
-        // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(view);
 
         return view;
     }

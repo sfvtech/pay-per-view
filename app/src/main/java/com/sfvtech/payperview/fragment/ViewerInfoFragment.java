@@ -20,9 +20,8 @@ import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.Regex;
 import com.mobsandgeeks.saripaar.annotation.Required;
 import com.mobsandgeeks.saripaar.annotation.TextRule;
-import com.sfvtech.payperview.Installation;
+import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
-import com.sfvtech.payperview.ViewHelper;
 import com.sfvtech.payperview.Viewer;
 import com.sfvtech.payperview.ViewerSurvey;
 import com.sfvtech.payperview.database.DatabaseContract;
@@ -61,6 +60,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     private Viewer editViewer;
     private boolean editing;
     private boolean adding;
+    private int MAX_VIEWERS;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,9 +70,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
 
         Bundle args = getArguments();
 
-        // Trigger creation of unique installation id
-        // TODO better ID
-        String installationId = new Installation().getId(getContext());
+        String installationId = MainActivity.ID;
 
         // Create a new session
         // @todo move getWritableDatabase() into AsyncTask
@@ -82,6 +80,10 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         values.put(DatabaseContract.SessionEntry.COLUMN_START_TIME, new Date().toString());
         String locale = getResources().getConfiguration().locale.toString();
         values.put(DatabaseContract.SessionEntry.COLUMN_LOCALE, locale);
+
+        values.put(DatabaseContract.SessionEntry.COLUMN_LAT, MainActivity.longitude);
+        values.put(DatabaseContract.SessionEntry.COLUMN_LONG, MainActivity.latitude);
+
         long newRowId = database.insert(
                 DatabaseContract.SessionEntry.TABLE_NAME,
                 DatabaseContract.SessionEntry.COLUMN_NULLABLE,
@@ -123,6 +125,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
                 mNameEditText.setText(editViewer.getName());
             }
         }
+
         if (args.containsKey("mViewers")) {
             if (!args.containsKey("Viewer")) {
                 adding = true;
@@ -130,12 +133,14 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
 
+        if (args.containsKey("MAX_VIEWERS")) {
+            MAX_VIEWERS = args.getInt("MAX_VIEWERS");
+        }
+
         // Validator
         mValidator = new Validator(this);
         mValidator.setValidationListener(this);
 
-        // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(view);
         okButton = (Button) view.findViewById(R.id.okButton);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,29 +175,24 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             Bundle args = new Bundle();
             args.putParcelable("editedViewer", getViewer());
             args.putParcelableArrayList("mViewers", mViewers);
+            args.putInt("MAX_VIEWERS", MAX_VIEWERS);
             editViewerInfo.setArguments(args);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.container, editViewerInfo);
             ft.commit();
             editing = false;
-        }
-        if (adding) {
-            Fragment editViewerInfo = new EditViewersFragment();
-            Bundle args = new Bundle();
-            args.putParcelableArrayList("mViewers", mViewers);
-            editViewerInfo.setArguments(args);
+        } else if (adding) {
+            Fragment editViewerInfo = EditViewersFragment.create(mViewers, MAX_VIEWERS);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.container, editViewerInfo);
             ft.commit();
             adding = false;
-        }
-        if (mViewers.size() == mNViewers) {
+        } else if (mViewers.size() == mNViewers) {
             getViewerInfo(mViewers);
         } else {
             clearForm();
             okButton.setBackgroundResource(R.drawable.button_sm_deselected);
         }
-
     }
 
     @Override

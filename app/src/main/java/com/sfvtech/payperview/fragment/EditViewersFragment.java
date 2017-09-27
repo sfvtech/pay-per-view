@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
     Button confirmButton;
     Button addNewButton;
     Button restartButton;
+    int MAX_VIEWERS;
     private ArrayList<Viewer> mViewers;
     private ViewerAdapter myAdapter;
 
@@ -35,9 +37,11 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
-    public static EditViewersFragment create(ArrayList<Viewer> mViewers) {
+    public static EditViewersFragment create(ArrayList<Viewer> mViewers, int MAX_VIEWERS) {
         final Bundle arguments = new Bundle();
         arguments.putParcelableArrayList("mViewers", mViewers);
+        arguments.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        Log.v("CREATE MAX", MAX_VIEWERS + "");
         final EditViewersFragment fragment = new EditViewersFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -59,22 +63,36 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mViewers = getArguments().getParcelableArrayList("mViewers");
+        if (getArguments().containsKey("mViewers")) {
+            mViewers = getArguments().getParcelableArrayList("mViewers");
+        }
+
+        if (getArguments().containsKey("MAX_VIEWERS")) {
+            MAX_VIEWERS = getArguments().getInt("MAX_VIEWERS");
+        }
+
+        Log.v("MAX ON CREATE", MAX_VIEWERS + "");
 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_edit_viewers, container, false);
 
         // Inflate list of viewers
         listView = v.findViewById(R.id.list);
-        myAdapter = new ViewerAdapter(getContext(), mViewers);
+        myAdapter = new ViewerAdapter(getContext(), mViewers, MAX_VIEWERS);
         listView.setAdapter(myAdapter);
 
-        addNewButton = (Button) v.findViewById(R.id.addNew);
-        addNewButton.setOnClickListener(this);
         confirmButton = (Button) v.findViewById(R.id.confirm);
         confirmButton.setOnClickListener(this);
+
         restartButton = (Button) v.findViewById(R.id.restartButton);
         restartButton.setOnClickListener(this);
+
+        addNewButton = (Button) v.findViewById(R.id.addNew);
+        if (mViewers.size() < MAX_VIEWERS) {
+            addNewButton.setOnClickListener(this);
+        } else {
+            addNewButton.setVisibility(View.GONE);
+        }
 
         return v;
     }
@@ -86,6 +104,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 final Fragment viewerInfoFragment = new ViewerInfoFragment();
                 Bundle args = new Bundle();
                 args.putParcelableArrayList("mViewers", mViewers);
+                args.putInt("MAX_VIEWERS", MAX_VIEWERS);
                 viewerInfoFragment.setArguments(args);
                 ((AppCompatActivity) getContext()).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).

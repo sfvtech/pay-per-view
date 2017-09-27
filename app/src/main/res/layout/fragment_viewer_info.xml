@@ -36,7 +36,7 @@
             android:layout_marginTop="12dp"
             android:ems="16"
             android:hint="@string/name"
-            android:inputType="textVisiblePassword|textNoSuggestions"
+            android:inputType="textVisiblePassword|textNoSuggestions|textPersonName"
             android:textIsSelectable="false"
             android:textSize="48sp" />
 

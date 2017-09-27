@@ -33,6 +33,10 @@ public class DatabaseContract {
         public static final String COLUMN_NULLABLE = "end_time";
         // Locale
         public static final String COLUMN_LOCALE = "locale";
+
+        public static final String COLUMN_LAT = "latitude";
+
+        public static final String COLUMN_LONG = "longitude";
     }
 
     public static final class ViewerEntry implements BaseColumns {

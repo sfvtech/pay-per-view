@@ -1,12 +1,13 @@
 package com.sfvtech.payperview;
 
-import android.content.Context;
-import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.sfvtech.payperview.admin.AdminActivity;
+import com.sfvtech.payperview.fragment.AdminFragment;
 
 import java.util.Date;
 
@@ -18,7 +19,6 @@ public class ViewHelper {
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 200;
     private static final String LOG_TAG = "ViewHelper";
-
     private static final long MAGIC_BUTTON_MAX_MS = 2000; // milliseconds
 
     /**
@@ -52,7 +52,7 @@ public class ViewHelper {
                     if (mLastButtonIndex == 1) {
                         long interval = new Date().getTime() - mTimerStart.getTime();
                         if (interval < MAGIC_BUTTON_MAX_MS) {
-                            startAdminActivity(myLayout);
+                            startAdminFragment(myLayout);
                         }
                     }
                     // Reset the button tracker
@@ -88,11 +88,16 @@ public class ViewHelper {
         }
     }
 
-    protected static void startAdminActivity(View v) {
-        // @todo figure out how to get the session id to the admin activity
-        Context c = v.getContext();
-        Intent intent = new Intent(c, AdminActivity.class);
-        c.startActivity(intent);
+    protected static void startAdminFragment(View v) {
+        Fragment adminFragment = new AdminFragment();
+        Bundle args = new Bundle();
+        args.putString("currentFragmentTag", MainActivity.currentFragmentTag);
+        args.putParcelableArrayList("mViewers", MainActivity.mViewers);
+        args.putString("ID", MainActivity.ID);
+        adminFragment.setArguments(args);
+        ((AppCompatActivity) v.getContext()).getSupportFragmentManager().
+                beginTransaction().replace(R.id.container, adminFragment, AdminFragment.FRAGMENT_TAG).
+                commit();
     }
 
     /**
