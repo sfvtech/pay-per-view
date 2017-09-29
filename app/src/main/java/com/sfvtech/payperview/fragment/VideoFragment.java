@@ -2,9 +2,12 @@ package com.sfvtech.payperview.fragment;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -12,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sfvtech.payperview.R;
+import com.sfvtech.payperview.SubtitleView;
+
+import java.io.IOException;
 
 
 /**
@@ -23,6 +29,7 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
     // Log tag.
     private static final String TAG = VideoFragment.class.getName();
     VideoFragment.OnVideoFinishedListener mCallback;
+    SubtitleView subtitleView;
     private VideoPlayer mPlayer = new VideoPlayer();
 
     public VideoFragment() {
@@ -35,8 +42,10 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_video, container, false);
         SurfaceView mSurface = (SurfaceView) v.findViewById(R.id.video_surface);
+        subtitleView = (SubtitleView) v.findViewById(R.id.subs_box);
         SurfaceHolder mSurfaceHolder = mSurface.getHolder();
         mSurfaceHolder.addCallback(this);
+        mPlayer.setSubtitleView(subtitleView);
         mPlayer.setSurface(mSurfaceHolder);
 
         return v;
@@ -84,10 +93,10 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
         private MediaPlayer mPlayer;
         private int mPosition = 0;
         private SurfaceHolder mSurfaceHolder;
+        private SubtitleView subtitleView;
 
         public void stop() {
             if (mPlayer != null) {
-                mCallback.onVideoFinished();
                 mPlayer.release();
                 mPlayer = null;
             }
@@ -102,28 +111,71 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
 
         public void play(final Context c) {
             stop();
-            // TODO: replace raw video file with actual file below
-            mPlayer = MediaPlayer.create(c, R.raw.small);
-            mPlayer.setDisplay(mSurfaceHolder);
-            mPlayer.setLooping(false);
-            mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    stop();
+            final Uri uri = openVideo();
+            Log.v("URI", uri.toString());
+            final String subtitlesUri = getSubtitles();
+            Log.v("Tag subtitles", subtitlesUri);
+            try {
+                mPlayer = new MediaPlayer();
+                try {
+                    mPlayer.setDataSource(c, openVideo());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            });
-            if (mPosition > 0) {
-                mPlayer.seekTo(mPosition);
+                mPlayer.setDisplay(mSurfaceHolder);
+                subtitleView.setPlayer(mPlayer);
+                // Replace with actual subs file
+                // .srt file https://en.wikipedia.org/wiki/SubRip
+                // Sample srt file download link https://tinyurl.com/ybsz3gw3
+                subtitleView.setSubSourceFromFile(subtitlesUri, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+                mPlayer.setLooping(false);
+                mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        stop();
+                        mCallback.onVideoFinished();
+                    }
+                });
+                if (mPosition > 0) {
+                    mPlayer.seekTo(mPosition);
+                }
+                mPlayer.setOnPreparedListener(
+                        new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                mp.start();
+                            }
+                        });
+                mPlayer.prepareAsync();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
             }
-            mPlayer.start();
         }
 
         public void setSurface(SurfaceHolder sh) {
             mSurfaceHolder = sh;
         }
 
+        public void setSubtitleView(SubtitleView sbtview) {
+            subtitleView = sbtview;
+        }
+
         public void resetPosition() {
             mPosition = 0;
+        }
+
+        public Uri openVideo() {
+            final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
+            final String localUriString = preferences.getString("localURIForVideo", null);
+            return Uri.parse(localUriString);
+        }
+
+        public String getSubtitles() {
+            final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
+            final String localUriString = preferences.getString("localURIForSubtitles", null);
+            return localUriString;
         }
     }
 }

@@ -16,23 +16,16 @@
         style="@style/AdminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:onClick="handleRestart"
         android:text="@string/admin_restart_button" />
-
-    <Button
-        android:id="@+id/adminQuitButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:onClick="handleQuit"
-        android:text="@string/admin_quit_button" />
 
     <Button
         android:id="@+id/adminUploadButton"
         style="@style/AdminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:onClick="handleUpload"
         android:text="@string/admin_upload_button" />
 
@@ -41,9 +34,76 @@
         style="@style/AdminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="60dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="30dp"
         android:onClick="handleCancel"
         android:text="@string/admin_cancel_button" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="40dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Insert URL for downloading video here" />
+
+            <EditText
+                android:id="@+id/videoURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="URL" />
+
+            <Button
+                android:id="@+id/download_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download" />
+
+            <TextView
+                android:id="@+id/videoFileSet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="File set? No" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Insert URL for downloading subtitle .SRT files here" />
+
+            <EditText
+                android:id="@+id/subtitlesURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="URL" />
+
+            <Button
+                android:id="@+id/download_subtitles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download" />
+
+            <TextView
+                android:id="@+id/subtitlesFileSet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="File set? No" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <TableLayout
         android:layout_width="wrap_content"

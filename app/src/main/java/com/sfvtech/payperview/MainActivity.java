@@ -1,9 +1,14 @@
 package com.sfvtech.payperview;
 
 import android.Manifest;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,9 +16,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.RelativeLayout;
 
 import com.sfvtech.payperview.database.DatabaseHelper;
@@ -32,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         SurveyFragment.OnSurveyFinishedListener, ThankYouFragment.OnSessionFinishedListener,
         EditViewersFragment.onEditViewersFinishedListener {
 
-    // Constants
     //public static final String EXTRA_VIEWERS = ViewerSurvey.PACKAGE + ":EXTRA_VIEWERS";
     public static final String LOG_TAG = "ViewerInfoActivity";
     public static final int MY_PERMISSION_REQUEST_LOCATION = 100;
@@ -41,10 +47,51 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     public static int MAX_VIEWERS = 0;
     public static int mNViewers = 0;
     public static ArrayList<Viewer> mViewers;
-    public static String currentFragmentTag;
     public static String ID;
     public static double longitude;
     public static double latitude;
+    /**
+     * Attachment download complete receiver.
+     * 1. Receiver gets called once attachment download completed.
+     * 2. Open the downloaded file.
+     */
+    BroadcastReceiver attachmentDownloadCompleteReceive = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v("Tag: Received", "received");
+            String action = intent.getAction();
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+                Log.v("Tag: download ID", "" + downloadId);
+                DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Query query = new DownloadManager.Query();
+                query.setFilterById(downloadId);
+                try (Cursor cursor = downloadManager.query(query)) {
+                    if (cursor.moveToFirst()) {
+                        Log.v("Tag: cursormovetofirst", "" + downloadId);
+                        String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        final String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uriString);
+                        Log.v("Tag: uriString", uriString);
+                        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                        // final String fileName = URLUtil.guessFileName(Uri.decode(localUri), null, mimeType);
+                        //final Uri uriForFile = FileProvider.getUriForFile(context, "com.sfvtech.payperview" + FILE_PROVIDER_EXTENSION, file);
+                        int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                        Log.v("Tag: downloadstatus", "" + downloadStatus);
+                        Log.v("Tag: uriString", uriString);
+                        if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL)) {
+                            SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+                            if (fileExtension.equals(".mp4")) {
+                                preferences.edit().putString("localURIForVideo", uriString).apply();
+                                Log.v("TAG download local URI", uriString);
+                            } else {
+                                preferences.edit().putString("localURIForSubtitles", uriString).apply();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
     private RelativeLayout mainRoot;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -77,15 +124,30 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         getLocation();
 
         Fragment viewerNumberFragment = new ViewerNumberFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.add(R.id.container, viewerNumberFragment);
+        ft.addToBackStack(null);
         ft.commit();
 
         // Add our magic buttons to the main activity layout
         mainRoot = (RelativeLayout) findViewById(R.id.main_root);
         ViewHelper.addMagicMenuButtons(mainRoot);
+    }
 
-        currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(attachmentDownloadCompleteReceive, new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(attachmentDownloadCompleteReceive);
     }
 
     @Override
@@ -96,10 +158,13 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         args.putInt("nViewers", nViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         viewerInfoFragment.setArguments(args);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerInfoFragment);
+        ft.addToBackStack(null);
         ft.commit();
-        currentFragmentTag = ViewerInfoFragment.FRAGMENT_TAG;
     }
 
     @Override
@@ -108,10 +173,13 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
 
         // Go to video
         Fragment videoFragment = new VideoFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, videoFragment);
+        ft.addToBackStack(null);
         ft.commit();
-        currentFragmentTag = VideoFragment.FRAGMENT_TAG;
     }
 
     @Override
@@ -119,10 +187,14 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         // Go to edit viewers
         Log.v("TAG from video MAX", MAX_VIEWERS + "");
         Fragment editViewersFragment = EditViewersFragment.create(mViewers, MAX_VIEWERS);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.executePendingTransactions();
+        //this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, editViewersFragment);
+        ft.addToBackStack(null);
         ft.commit();
-        currentFragmentTag = EditViewersFragment.FRAGMENT_TAG;
     }
 
     @Override
@@ -136,17 +208,25 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             Bundle args = new Bundle();
             args.putParcelableArrayList("mViewers", mViewers);
             surveyFragment.setArguments(args);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.executePendingTransactions();
+            //this will clear the back stack and displays no animation on the screen
+            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.container, surveyFragment);
+            ft.addToBackStack(null);
             ft.commit();
-            currentFragmentTag = SurveyFragment.FRAGMENT_TAG;
         } else {
             mViewers.clear();
             Fragment viewerNumberFragment = new ViewerNumberFragment();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.executePendingTransactions();
+            //this will clear the back stack and displays no animation on the screen
+            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.add(R.id.container, viewerNumberFragment);
+            ft.addToBackStack(null);
             ft.commit();
-            currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
         }
     }
 
@@ -154,10 +234,14 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     public void onSurveyFinished() {
         // Go to thank you
         Fragment thankYouFragment = new ThankYouFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.executePendingTransactions();
+        //this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, thankYouFragment);
+        ft.addToBackStack(null);
         ft.commit();
-        currentFragmentTag = ThankYouFragment.FRAGMENT_TAG;
     }
 
     @Override
@@ -166,10 +250,13 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         mViewers.clear();
         mNViewers = 0;
         Fragment viewerNumberFragment = new ViewerNumberFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //this will clear the back stack and displays no animation on the screen
+        // fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerNumberFragment);
+        ft.addToBackStack(null);
         ft.commit();
-        currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
     }
 
     @Override
@@ -184,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                     getLocation();
 
                 } else {
-
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -231,6 +317,4 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             }
         }
     }
-
-
 }

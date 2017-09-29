@@ -8,4 +8,12 @@
         android:defaultValue=""
         android:key="ID"
         android:title="Unique Device ID" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="localURIForVideo"
+        android:title="Unique Device ID" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="localURIForSubtitles"
+        android:title="Unique Device ID" />
 </PreferenceScreen>
