@@ -21,9 +21,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sfvtech.payperview.admin.AdminActivity;
 import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
+import com.sfvtech.payperview.fragment.AdminFragment;
 
 import java.io.BufferedWriter;
 import java.io.OutputStream;
@@ -107,7 +107,7 @@ public class DataUploadActivity extends Activity {
      */
     private String getNewRecordsAsCsv() {
 
-        String csv = "";
+        StringBuilder csv = new StringBuilder();
 
         SQLiteDatabase database = new DatabaseHelper(this).getReadableDatabase();
         String selectQuery = "SELECT " +
@@ -118,6 +118,8 @@ public class DataUploadActivity extends Activity {
                 "V." + DatabaseContract.ViewerEntry.COLUMN_SURVEY_ANSWER + ", " +
                 "S." + DatabaseContract.SessionEntry.COLUMN_START_TIME + ", " +
                 "S." + DatabaseContract.SessionEntry.COLUMN_END_TIME + ", " +
+                "S." + DatabaseContract.SessionEntry.COLUMN_LAT + ", " +
+                "S." + DatabaseContract.SessionEntry.COLUMN_LONG + ", " +
                 "S." + DatabaseContract.SessionEntry.COLUMN_LOCALE +
                 " FROM " + DatabaseContract.ViewerEntry.TABLE_NAME + " V" +
                 " JOIN " + DatabaseContract.SessionEntry.TABLE_NAME + " S" +
@@ -125,28 +127,28 @@ public class DataUploadActivity extends Activity {
                 " = " + "V." + DatabaseContract.ViewerEntry.COLUMN_SESSION_ID +
                 " WHERE " + "V." + DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME + " IS NULL;";
 
-        Cursor cursor = database.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding string
-        if (cursor.moveToFirst()) {
-            // @todo use StringBuilder as recommended here http://stackoverflow.com/questions/15512190/how-to-insert-a-new-line-character-in-a-string-to-printstream-then-use-a-scanner
-            do {
-                String record = "";
-
-                record += cursor.getString(0) + ","; // viewer id
-                record += cursor.getString(1) + ","; // session id
-                record += cursor.getString(2) + ","; // viewer name
-                record += cursor.getString(3) + ","; // viewer email
-                record += cursor.getString(4) + ","; // viewer pledge
-                record += "\"" + cursor.getString(5) + "\","; // session start time
-                record += "\"" + cursor.getString(6) + "\","; // session end time
-                record += cursor.getString(7); // session locale
-                csv += record + "\n";
-            } while (cursor.moveToNext());
+        // Auto closeable cursor try-with-resources
+        try (Cursor cursor = database.rawQuery(selectQuery, null)) {
+            // looping through all rows and adding string
+            if (cursor.moveToFirst()) {
+                do {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append(cursor.getString(0)).append(","); // viewer id
+                    stringBuilder.append(cursor.getString(1)).append(","); // session id
+                    stringBuilder.append(cursor.getString(2)).append(","); // viewer name
+                    stringBuilder.append(cursor.getString(3)).append(","); // viewer email
+                    stringBuilder.append(cursor.getString(4)).append(","); // viewer pledge
+                    stringBuilder.append("\"").append(cursor.getString(5)).append("\","); // session start time
+                    stringBuilder.append("\"").append(cursor.getString(6)).append("\","); // session end time
+                    stringBuilder.append(cursor.getDouble(7)).append(","); // session latitude
+                    stringBuilder.append(cursor.getDouble(8)).append(","); // session longitude
+                    stringBuilder.append(cursor.getString(9)); // session locale
+                    csv.append(stringBuilder).append("\n");
+                } while (cursor.moveToNext());
+            }
         }
-
         database.close();
-        return csv;
+        return csv.toString();
     }
 
     /**
@@ -273,7 +275,7 @@ public class DataUploadActivity extends Activity {
             String url = params[0];
             String data = params[1];
 
-            String installationId = getIntent().getExtras().getString(AdminActivity.EXTRA_INSTALLATION_ID);
+            String installationId = getIntent().getExtras().getString(AdminFragment.EXTRA_INSTALLATION_ID);
 
             try {
                 URL urlObj = new URL(url);

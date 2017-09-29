@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sfvtech.payperview.R;
-import com.sfvtech.payperview.ViewHelper;
 import com.sfvtech.payperview.Viewer;
 import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
@@ -31,7 +30,7 @@ import java.util.ListIterator;
  */
 public class SurveyFragment extends Fragment implements View.OnClickListener {
 
-    public static final String LOG_TAG = "SurveyFragment";
+    public static final String FRAGMENT_TAG = "SurveyFragment";
     SurveyFragment.OnSurveyFinishedListener mCallback;
     private List<Viewer> mViewers;
     private ListIterator<Viewer> mViewersIterator;
@@ -77,9 +76,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener {
         mViewersIterator = mViewers.listIterator(0);
         incrementViewer();
 
-        // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(v);
-
         return v;
     }
 
@@ -110,7 +106,7 @@ public class SurveyFragment extends Fragment implements View.OnClickListener {
         String choice = "";
         deselectAllButtons();
         view.setBackgroundResource(R.drawable.button_med_selected);
-
+        mCurrentViewer.setSurveyAnswer(choice);
         // Check which radio button was clicked
         switch (view.getId()) {
             case R.id.survey_option_one:
@@ -148,7 +144,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
         }
-        mCurrentViewer.setSurveyAnswer(choice);
     }
 
     // @todo move this into the Session model
@@ -170,7 +165,7 @@ public class SurveyFragment extends Fragment implements View.OnClickListener {
                 selection,
                 selectionArgs
         );
-        Log.d(LOG_TAG, "Just updated " + Integer.toString(count) + " session row, id is " + Long.toString(sessionId));
+        Log.d(FRAGMENT_TAG, "Just updated " + Integer.toString(count) + " session row, id is " + Long.toString(sessionId));
         database.close();
     }
 
@@ -194,9 +189,10 @@ public class SurveyFragment extends Fragment implements View.OnClickListener {
         );
 
         database.close();
-        Log.d(LOG_TAG, "Just inserted user id " + Long.toString(newRowId));
+        Log.d(FRAGMENT_TAG, "Just inserted user id " + Long.toString(newRowId));
 
     }
+
 
     public void deselectAllButtons() {
 

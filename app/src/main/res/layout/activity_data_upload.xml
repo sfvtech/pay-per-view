@@ -1,28 +1,27 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.sfvtech.payperview.admin.AdminActivity">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/title_data_upload"
         style="@style/TitleText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentTop="true"
         android:text="@string/data_upload_title" />
 
     <TableLayout
-        android:layout_width="500dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:stretchColumns="1">
+        android:layout_gravity="center"
+        android:layout_margin="40dp"
+        android:padding="40dp"
+        android:stretchColumns="0, 1">
 
         <TableRow>
-            <TextView style="@style/TableCell"
-                android:layout_column="1"
+
+            <TextView
+                style="@style/TableCell"
                 android:text="@string/records_to_upload_label" />
 
             <TextView
@@ -30,9 +29,11 @@
                 style="@style/TableCell"
                 android:text="@string/records_to_upload_value" />
         </TableRow>
+
         <TableRow>
-            <TextView style="@style/TableCell"
-                android:layout_column="1"
+
+            <TextView
+                style="@style/TableCell"
                 android:text="@string/network_status_label" />
 
             <TextView
@@ -40,9 +41,11 @@
                 style="@style/TableCell"
                 android:text="@string/network_status_offline" />
         </TableRow>
+
         <TableRow>
-            <TextView style="@style/TableCell"
-                android:layout_column="1"
+
+            <TextView
+                style="@style/TableCell"
                 android:text="@string/server_status_label" />
 
             <TextView
@@ -50,29 +53,43 @@
                 style="@style/TableCell"
                 android:text="@string/server_status_offline" />
         </TableRow>
-
     </TableLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true">
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Button
             android:id="@+id/uploadButton"
             style="@style/AdminButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
             android:onClick="uploadData"
             android:text="@string/upload_button" />
+
         <Button
             android:id="@+id/adminCancelButton"
             style="@style/AdminButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
             android:onClick="handleCancel"
             android:text="@string/admin_cancel_button" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

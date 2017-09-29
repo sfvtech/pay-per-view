@@ -6,6 +6,7 @@ public class Session {
     private long mSessionId;
     private Date mStartTime;
     private Date mEndTime;
+    private long GPS_DATA;
 
     public Session() {
         mStartTime = new Date();
@@ -21,5 +22,9 @@ public class Session {
 
     public void setId(long id) {
         mSessionId = id;
+    }
+
+    public void setGPS_DATA(long gps) {
+        GPS_DATA = gps;
     }
 }

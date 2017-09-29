@@ -80,7 +80,7 @@
 
     <string name="viewers_still_here_question" translatable="true">Who\'s still here?</string>
     <string name="confirm" translatable="true">Confirm Viewers</string>
-    <string name="add_new_viewer" translatable="true">Add Another</string>
+    <string name="add_new_viewer" translatable="true">Add New</string>
     <string name="restart_from_viewers" translatable="true">Restart</string>
 
 

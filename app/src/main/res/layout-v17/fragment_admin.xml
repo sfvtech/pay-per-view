@@ -1,14 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.sfvtech.payperview.admin.AdminActivity">
+    android:gravity="center"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:gravity="center"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/admin_title"
             style="@style/TitleText"
@@ -19,16 +20,17 @@
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center"
         android:orientation="vertical">
+
         <Button
             android:id="@+id/adminRestartButton"
             style="@style/AdminButton"
             android:layout_height="wrap_content"
             android:onClick="handleRestart"
             android:text="@string/admin_restart_button" />
+
         <Button
             android:id="@+id/adminQuitButton"
             style="@style/AdminButton"
@@ -36,12 +38,14 @@
             android:enabled="false"
             android:onClick="handleQuit"
             android:text="@string/admin_quit_button" />
+
         <Button
             android:id="@+id/adminUploadButton"
             style="@style/AdminButton"
             android:layout_height="wrap_content"
             android:onClick="handleUpload"
             android:text="@string/admin_upload_button" />
+
         <Button
             android:id="@+id/adminCancelButton"
             style="@style/AdminButton"
@@ -55,38 +59,40 @@
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentTop="false"
-        android:layout_marginLeft="25dp"
+        android:layout_marginStart="25dp"
         android:orientation="vertical"
         android:paddingBottom="5dp"
         android:stretchColumns="1">
+
         <TableRow
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
+
             <TextView
                 android:id="@+id/installationIdLabel"
-                android:paddingLeft="0dp"
-                android:paddingRight="5dp"
+                android:paddingEnd="5dp"
+                android:paddingStart="0dp"
                 android:text="@string/installationIdLabel" />
+
             <TextView
                 android:id="@+id/installationIdValue"
                 android:text="@string/installationIdValue" />
         </TableRow>
+
         <TableRow
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
+
             <TextView
                 android:id="@+id/versionLabel"
-                android:paddingLeft="0dp"
-                android:paddingRight="5dp"
+                android:paddingEnd="5dp"
+                android:paddingStart="0dp"
                 android:text="@string/versionLabel" />
+
             <TextView
                 android:id="@+id/versionValue"
                 android:text="@string/versionValue" />
         </TableRow>
     </TableLayout>
 
-</RelativeLayout>
+</LinearLayout>

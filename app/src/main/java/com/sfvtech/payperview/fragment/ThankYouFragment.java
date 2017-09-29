@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sfvtech.payperview.R;
-import com.sfvtech.payperview.ViewHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,6 +19,7 @@ import java.util.TimerTask;
  */
 public class ThankYouFragment extends Fragment {
 
+    public static final String FRAGMENT_TAG = "ThankYouFragment";
     ThankYouFragment.OnSessionFinishedListener mCallback;
 
     public ThankYouFragment() {
@@ -42,8 +42,6 @@ public class ThankYouFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_thank_you, container, false);
-        // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(view);
 
         // Go to start activity after 10 seconds
         new Timer().schedule(new TimerTask() {

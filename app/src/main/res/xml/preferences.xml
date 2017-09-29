@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="3"
+        android:key="MAX_VIEWERS"
+        android:title="Max Viewers" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="ID"
+        android:title="Unique Device ID" />
+</PreferenceScreen>

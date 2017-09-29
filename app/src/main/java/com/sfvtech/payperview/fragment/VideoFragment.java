@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sfvtech.payperview.R;
-import com.sfvtech.payperview.ViewHelper;
 
 
 /**
@@ -20,9 +19,9 @@ import com.sfvtech.payperview.ViewHelper;
  */
 public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
 
+    public static final String FRAGMENT_TAG = "VideoFragment";
     // Log tag.
     private static final String TAG = VideoFragment.class.getName();
-
     VideoFragment.OnVideoFinishedListener mCallback;
     private VideoPlayer mPlayer = new VideoPlayer();
 
@@ -40,8 +39,6 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
         mSurfaceHolder.addCallback(this);
         mPlayer.setSurface(mSurfaceHolder);
 
-        // Magic Menu Buttons
-        ViewHelper.addMagicMenuButtons(v);
         return v;
     }
 
