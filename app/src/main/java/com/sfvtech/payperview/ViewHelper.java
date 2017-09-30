@@ -91,12 +91,11 @@ public class ViewHelper {
     protected static void startAdminFragment(View v) {
         Fragment adminFragment = new AdminFragment();
         Bundle args = new Bundle();
-        args.putString("currentFragmentTag", MainActivity.currentFragmentTag);
         args.putParcelableArrayList("mViewers", MainActivity.mViewers);
         args.putString("ID", MainActivity.ID);
         adminFragment.setArguments(args);
         ((AppCompatActivity) v.getContext()).getSupportFragmentManager().
-                beginTransaction().replace(R.id.container, adminFragment, AdminFragment.FRAGMENT_TAG).
+                beginTransaction().addToBackStack(null).replace(R.id.container, adminFragment, AdminFragment.FRAGMENT_TAG).
                 commit();
     }
 
