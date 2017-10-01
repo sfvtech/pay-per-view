@@ -128,7 +128,9 @@ public class DataUploadActivity extends Activity {
                 " WHERE " + "V." + DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME + " IS NULL;";
 
         // Auto closeable cursor try-with-resources
-        try (Cursor cursor = database.rawQuery(selectQuery, null)) {
+        Cursor cursor = null;
+        try {
+            cursor = database.rawQuery(selectQuery, null);
             // looping through all rows and adding string
             if (cursor.moveToFirst()) {
                 do {
@@ -145,6 +147,12 @@ public class DataUploadActivity extends Activity {
                     stringBuilder.append(cursor.getString(9)); // session locale
                     csv.append(stringBuilder).append("\n");
                 } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
         database.close();

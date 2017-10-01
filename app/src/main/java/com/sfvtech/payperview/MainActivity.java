@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     public static String ID;
     public static double longitude;
     public static double latitude;
+
     /**
      * Attachment download complete receiver.
      * 1. Receiver gets called once attachment download completed.
@@ -66,7 +67,9 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                 DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(downloadId);
-                try (Cursor cursor = downloadManager.query(query)) {
+                Cursor cursor = null;
+                try {
+                    cursor = downloadManager.query(query);
                     if (cursor.moveToFirst()) {
                         Log.v("Tag: cursormovetofirst", "" + downloadId);
                         String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
@@ -87,6 +90,12 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                                 preferences.edit().putString("localURIForSubtitles", uriString).apply();
                             }
                         }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
                     }
                 }
             }

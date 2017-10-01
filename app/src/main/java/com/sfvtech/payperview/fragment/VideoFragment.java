@@ -7,7 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -111,23 +111,29 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
 
         public void play(final Context c) {
             stop();
-            final Uri uri = openVideo();
-            Log.v("URI", uri.toString());
+            final String videoUriString = openVideo();
             final String subtitlesUri = getSubtitles();
-            Log.v("Tag subtitles", subtitlesUri);
             try {
-                mPlayer = new MediaPlayer();
-                try {
-                    mPlayer.setDataSource(c, openVideo());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!TextUtils.isEmpty(videoUriString)) {
+                    try {
+                        mPlayer = new MediaPlayer();
+                        mPlayer.setDataSource(c, Uri.parse(videoUriString));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    mPlayer = MediaPlayer.create(c, R.raw.small);
                 }
                 mPlayer.setDisplay(mSurfaceHolder);
-                subtitleView.setPlayer(mPlayer);
-                // Replace with actual subs file
-                // .srt file https://en.wikipedia.org/wiki/SubRip
-                // Sample srt file download link https://tinyurl.com/ybsz3gw3
-                subtitleView.setSubSourceFromFile(subtitlesUri, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+                if (!TextUtils.isEmpty(subtitlesUri)) {
+                    subtitleView.setPlayer(mPlayer);
+                    // Replace with actual subs file
+                    // .srt file https://en.wikipedia.org/wiki/SubRip
+                    // Sample srt file download link https://tinyurl.com/ybsz3gw3
+                    subtitleView.setSubSourceFromFile(subtitlesUri, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+                } else {
+                    // set subtitles from raw file or no subtitles
+                }
                 mPlayer.setLooping(false);
                 mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
@@ -166,10 +172,10 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
             mPosition = 0;
         }
 
-        public Uri openVideo() {
+        public String openVideo() {
             final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
             final String localUriString = preferences.getString("localURIForVideo", null);
-            return Uri.parse(localUriString);
+            return localUriString;
         }
 
         public String getSubtitles() {

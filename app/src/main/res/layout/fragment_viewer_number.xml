@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="false"
+    android:layout_margin="16dp"
     android:orientation="vertical">
 
     <TextView
@@ -11,26 +11,30 @@
 
     <LinearLayout
         android:id="@+id/buttonLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="3">
 
         <Button
             android:id="@+id/oneButton"
             style="@style/ViewerNumberOption"
+            android:layout_weight="1"
             android:clickable="true"
             android:text="1" />
 
         <Button
             android:id="@+id/twoButton"
             style="@style/ViewerNumberOption"
+            android:layout_weight="1"
             android:clickable="true"
             android:text="2" />
 
         <Button
             android:id="@+id/threeButton"
             style="@style/ViewerNumberOption"
+            android:layout_weight="1"
             android:clickable="true"
             android:text="3" />
     </LinearLayout>
@@ -39,7 +43,7 @@
         android:id="@+id/languageSelector"
         style="@style/LanguageSelector"
         android:layout_width="wrap_content"
-        android:layout_height="75dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:clickable="true"
         android:tag="@string/language_selector_value"
