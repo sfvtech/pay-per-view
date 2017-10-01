@@ -9,7 +9,7 @@
     <style name="TitleText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">32dp</item>
+        <item name="android:layout_margin">8dp</item>
         <item name="android:textSize">62sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -17,18 +17,18 @@
     <style name="ViewerNumberOption">
         <item name="android:textSize">100sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:padding">30dp</item>
-        <item name="android:layout_margin">30dp</item>
-        <item name="android:layout_width">200dp</item>
-        <item name="android:layout_height">200dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_margin">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/button_lg_deselected</item>
     </style>
 
     <style name="LanguageSelector">
         <item name="android:textSize">25sp</item>
-        <item name="android:layout_margin">72dp</item>
-        <item name="android:layout_width">75dp</item>
-        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_margin">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/button_lg_deselected</item>
     </style>
 
@@ -43,7 +43,7 @@
     </style>
 
     <style name="okButton">
-        <item name="android:layout_margin">48dp</item>
+        <item name="android:layout_margin">20dp</item>
         <item name="android:layout_width">125dp</item>
         <item name="android:layout_height">125dp</item>
         <item name="android:textSize">48sp</item>

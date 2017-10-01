@@ -149,6 +149,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
                 mValidator.validate();
             }
         });
+
         return view;
     }
 
