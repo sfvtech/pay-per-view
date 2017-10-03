@@ -1,52 +1,59 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/viewer_number_question"
-        style="@style/TitleText"
-        android:text="@string/viewer_number_question" />
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal"
-        android:weightSum="3">
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/viewer_number_question"
+            style="@style/TitleText"
+            android:text="@string/viewer_number_question" />
+
+        <LinearLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/oneButton"
+                style="@style/ViewerNumberOption"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/twoButton"
+                style="@style/ViewerNumberOption"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:text="2" />
+
+            <Button
+                android:id="@+id/threeButton"
+                style="@style/ViewerNumberOption"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:text="3" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/oneButton"
-            style="@style/ViewerNumberOption"
-            android:layout_weight="1"
+            android:id="@+id/languageSelector"
+            style="@style/LanguageSelector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:clickable="true"
-            android:text="1" />
+            android:tag="@string/language_selector_value"
+            android:text="@string/language_selector_label" />
 
-        <Button
-            android:id="@+id/twoButton"
-            style="@style/ViewerNumberOption"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:text="2" />
-
-        <Button
-            android:id="@+id/threeButton"
-            style="@style/ViewerNumberOption"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:text="3" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/languageSelector"
-        style="@style/LanguageSelector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:clickable="true"
-        android:tag="@string/language_selector_value"
-        android:text="@string/language_selector_label" />
-
-</LinearLayout>
+</RelativeLayout>

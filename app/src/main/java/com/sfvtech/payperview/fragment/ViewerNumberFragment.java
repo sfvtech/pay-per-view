@@ -25,6 +25,7 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
     Button mThreeButton;
     Button mLanguageSelector;
     OnViewerNumberSelectedListener mCallback;
+    Bundle args;
     private int MAX_VIEWERS;
 
     @Override
@@ -32,8 +33,8 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_viewer_number, container, false);
 
-        String installationId = MainActivity.ID;
-        LinearLayout buttonLayout = (LinearLayout) view.findViewById(R.id.buttonLayout);
+        final String installationId = MainActivity.ID;
+        final LinearLayout buttonLayout = (LinearLayout) view.findViewById(R.id.buttonLayout);
 
         // UI References
         mOneButton = (Button) view.findViewById(R.id.oneButton);
@@ -53,6 +54,7 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
             }
         });
 
+        args = new Bundle();
         return view;
     }
 
@@ -87,9 +89,9 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
     }
 
     private void toggleLanguage(String lang) {
-        Context c = getActivity();
+        final Context c = getActivity();
 
-        Configuration cfg = new Configuration();
+        final Configuration cfg = new Configuration();
         if (!TextUtils.isEmpty(lang)) {
             cfg.locale = new Locale(lang);
         } else {
@@ -111,6 +113,6 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
 
     // Container Activity must implement this interface
     public interface OnViewerNumberSelectedListener {
-        public void onViewerNumberSelected(int nViewers);
+        void onViewerNumberSelected(int nViewers);
     }
 }

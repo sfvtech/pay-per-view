@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,12 +41,17 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
     private Button cancelButton;
     private Button restartButton;
     private Button uploadButton;
+    private Button editViewersButton;
     private EditText videoURL;
     private EditText subtitlesURL;
     private Button downloadVideoButton;
     private Button downloadSubtitlesButton;
     private TextView subtitlesStatus;
     private TextView videoStatus;
+    private ArrayList<Viewer> mViewers = new ArrayList<Viewer>();
+    private int nViewers = 0;
+    private int MAX_VIEWERS = 0;
+    private String fragmentTag;
 
     public AdminFragment() {
         // Required empty public constructor
@@ -58,14 +62,26 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_admin, container, false);
+        final View v = inflater.inflate(R.layout.fragment_admin, container, false);
 
         // Set up metadata display
         if (getArguments().containsKey("ID")) {
             mInstallationId = getArguments().getString("ID");
         }
+        if (getArguments().containsKey("mViewers")) {
+            mViewers = getArguments().getParcelableArrayList("mViewers");
+        }
+        if (getArguments().containsKey("nViewers")) {
+            nViewers = getArguments().getInt("nViewers");
+        }
+        if (getArguments().containsKey("MAX_VIEWERS")) {
+            MAX_VIEWERS = getArguments().getInt("MAX_VIEWERS");
+        }
+        if (getArguments().containsKey("fragmentTag")) {
+            fragmentTag = getArguments().getString("fragmentTag");
+        }
 
-        TextView installationIdView = (TextView) v.findViewById(R.id.installationIdValue);
+        final TextView installationIdView = (TextView) v.findViewById(R.id.installationIdValue);
         installationIdView.setText(mInstallationId);
 
         cancelButton = (Button) v.findViewById(R.id.adminCancelButton);
@@ -86,6 +102,13 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         downloadVideoButton = (Button) v.findViewById(R.id.download_video);
         downloadVideoButton.setOnClickListener(this);
 
+        editViewersButton = (Button) v.findViewById(R.id.adminEditViewers);
+        editViewersButton.setOnClickListener(this);
+
+        if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG)) {
+            editViewersButton.setVisibility(View.GONE);
+        }
+
         final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
         final String localURIForSubtitles = preferences.getString("localURIForSubtitles", null);
         final String localURIForVideo = preferences.getString("localURIForVideo", null);
@@ -95,9 +118,9 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         videoStatus.setText(TextUtils.isEmpty(localURIForVideo) ? "Not set" : "File is set and at " + localURIForVideo);
 
         try {
-            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
-            String version = packageInfo.versionName;
-            TextView versionView = (TextView) v.findViewById(R.id.versionValue);
+            final PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            final String version = packageInfo.versionName;
+            final TextView versionView = (TextView) v.findViewById(R.id.versionValue);
             versionView.setText(version);
         } catch (Exception e) {
             Log.e(FRAGMENT_TAG, e.toString());
@@ -118,34 +141,75 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 handleUpload();
                 break;
             case R.id.download_video:
-                String urlForVideo = videoURL.getText().toString().trim();
+                final String urlForVideo = videoURL.getText().toString().trim();
                 queueDownload(urlForVideo, "video");
                 break;
             case R.id.download_subtitles:
-                String urlForSubtitles = subtitlesURL.getText().toString().trim();
+                final String urlForSubtitles = subtitlesURL.getText().toString().trim();
                 queueDownload(urlForSubtitles, "subtitles");
                 break;
+            case R.id.adminEditViewers:
+                final Fragment editViewersFragment = EditViewersFragment.create(mViewers, nViewers, fragmentTag);
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, editViewersFragment, EditViewersFragment.FRAGMENT_TAG).
+                        commit();
+                break;
+
         }
     }
 
     public void handleUpload() {
-        Intent intent = new Intent(getActivity(), DataUploadActivity.class);
+        final Intent intent = new Intent(getActivity(), DataUploadActivity.class);
         intent.putExtra(EXTRA_INSTALLATION_ID, mInstallationId);
         startActivity(intent);
     }
 
+    // Go back to where admin fragment was called with the fragment tag
     public void handleCancel() {
-        // Go back to where we were when we called admin menu
-        FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 1) {
-            fm.popBackStackImmediate();
-            fm.beginTransaction().commit();
+        final Bundle args = new Bundle();
+        args.putParcelableArrayList("mViewers", mViewers);
+        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        args.putInt("nViewers", nViewers);
+        switch (fragmentTag) {
+            case ViewerNumberFragment.FRAGMENT_TAG:
+                final Fragment viewerNumberFragment = new ViewerNumberFragment();
+                viewerNumberFragment.setArguments(args);
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, viewerNumberFragment, ViewerNumberFragment.FRAGMENT_TAG).
+                        commit();
+                break;
+            case VideoFragment.FRAGMENT_TAG:
+                // If we interrupt the video fragment we should restart
+                final Fragment videoFragment = new VideoFragment();
+                videoFragment.setArguments(args);
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, videoFragment, VideoFragment.FRAGMENT_TAG).
+                        commit();
+                break;
+            case ViewerInfoFragment.FRAGMENT_TAG:
+                final Fragment viewerInfoFragment = new ViewerInfoFragment();
+                viewerInfoFragment.setArguments(args);
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).
+                        commit();
+                break;
+            case SurveyFragment.FRAGMENT_TAG:
+                // TODO will this make the same viewers restart their surveys..?
+                final Fragment surveyFragment = new SurveyFragment();
+                surveyFragment.setArguments(args);
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, surveyFragment, SurveyFragment.FRAGMENT_TAG).
+                        commit();
+                break;
+            case ThankYouFragment.FRAGMENT_TAG:
+            default:
+                restart();
         }
     }
 
     private void restart() {
         final Fragment viewerNumberFragment = new ViewerNumberFragment();
-        Bundle restartArgs = new Bundle();
+        final Bundle restartArgs = new Bundle();
         restartArgs.putParcelableArrayList("mViewers", new ArrayList<Viewer>());
         viewerNumberFragment.setArguments(restartArgs);
         ((AppCompatActivity) getContext()).getSupportFragmentManager().
@@ -157,11 +221,11 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
      * Use Android's Download Manager to queue this download.
      */
     private void queueDownload(String URL, String videoOrSubtitles) {
-        String fileName = videoOrSubtitles.equals("video") ? "video.mp4" : "subtitles.srt";
+        final String fileName = videoOrSubtitles.equals("video") ? "video.mp4" : "subtitles.srt";
         try {
             if (URL != null && !URL.isEmpty()) {
                 Uri uri = Uri.parse(URL);
-                DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
                 final DownloadManager.Request request = new DownloadManager.Request(uri)
                         .addRequestHeader("Referer", URL)
                         .setMimeType(DownloadUtils.getMimeType(URL))

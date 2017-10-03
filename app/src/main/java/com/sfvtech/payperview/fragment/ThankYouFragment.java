@@ -21,6 +21,7 @@ public class ThankYouFragment extends Fragment {
 
     public static final String FRAGMENT_TAG = "ThankYouFragment";
     ThankYouFragment.OnSessionFinishedListener mCallback;
+    private Timer timer = new Timer();
 
     public ThankYouFragment() {
         // Required empty public constructor
@@ -41,14 +42,10 @@ public class ThankYouFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_thank_you, container, false);
+        final View view = inflater.inflate(R.layout.fragment_thank_you, container, false);
 
         // Go to start activity after 10 seconds
-        new Timer().schedule(new TimerTask() {
-            public void run() {
-                mCallback.onSessionFinished();
-            }
-        }, 10000);
+        timer.schedule(new MyTimerTask(), 10000);
 
         return view;
     }
@@ -56,6 +53,18 @@ public class ThankYouFragment extends Fragment {
     // Container Activity must implement this interface
     public interface OnSessionFinishedListener {
         void onSessionFinished();
+    }
+
+    private class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mCallback.onSessionFinished();
+                }
+            });
+        }
     }
 
 }

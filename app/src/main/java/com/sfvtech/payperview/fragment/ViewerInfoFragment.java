@@ -61,6 +61,8 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     private boolean editing;
     private boolean adding;
     private int MAX_VIEWERS;
+    private String fragmentTag;
+    private Bundle args;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,15 +70,15 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_viewer_info, container, false);
 
-        Bundle args = getArguments();
+        args = getArguments();
 
         String installationId = MainActivity.ID;
 
         // Create a new session
         // @todo move getWritableDatabase() into AsyncTask
-        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
+        final SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+        final ContentValues values = new ContentValues();
         values.put(DatabaseContract.SessionEntry.COLUMN_START_TIME, new Date().toString());
         String locale = getResources().getConfiguration().locale.toString();
         values.put(DatabaseContract.SessionEntry.COLUMN_LOCALE, locale);
@@ -103,6 +105,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mNameEditText = (EditText) view.findViewById(R.id.nameEditText);
         mEmailEditText = (EditText) view.findViewById(R.id.emailEditText);
 
+
         // Make sure soft keyboard pops up when Name has focus
         mNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -116,7 +119,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mNameEditText.requestFocus();
 
         if (args.containsKey("Viewer")) {
-            editing = true;
             editViewer = args.getParcelable("Viewer");
             if (editViewer.getEmail() != null) {
                 mEmailEditText.setText(editViewer.getEmail());
@@ -126,15 +128,28 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             }
         }
 
-        if (args.containsKey("mViewers")) {
-            if (!args.containsKey("Viewer")) {
+        if (args.containsKey("editing")) {
+            if (args.getBoolean("editing")) {
+                editing = true;
+            }
+        }
+        if (args.containsKey("adding")) {
+            if (args.getBoolean("adding")) {
                 adding = true;
             }
+        }
+
+
+        if (args.containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
 
         if (args.containsKey("MAX_VIEWERS")) {
             MAX_VIEWERS = args.getInt("MAX_VIEWERS");
+        }
+
+        if (args.containsKey("fragmentTag")) {
+            fragmentTag = args.getString("fragmentTag");
         }
 
         // Validator
@@ -164,33 +179,30 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         }
     }
 
-    private void getViewerInfo(ArrayList<Viewer> mViewers) {
-        mCallback.onViewerInfoSubmitted(mViewers);
+    private void getViewerInfo(ArrayList<Viewer> mViewers, boolean completed) {
+        mCallback.onViewerInfoSubmitted(mViewers, completed);
     }
 
     @Override
     public void onValidationSucceeded() {
         mViewers.add(getViewer());
-        if (editing) {
-            Fragment editViewerInfo = new EditViewersFragment();
-            Bundle args = new Bundle();
-            args.putParcelable("editedViewer", getViewer());
-            args.putParcelableArrayList("mViewers", mViewers);
-            args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        final Bundle args = new Bundle();
+        args.putParcelable("editedViewer", getViewer());
+        args.putParcelableArrayList("mViewers", mViewers);
+        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        args.putString("fragmentTag", fragmentTag);
+        if (editing || adding) {
+            final Fragment editViewerInfo = new EditViewersFragment();
             editViewerInfo.setArguments(args);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            final FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.container, editViewerInfo);
             ft.commit();
             editing = false;
-        } else if (adding) {
-            Fragment editViewerInfo = EditViewersFragment.create(mViewers, MAX_VIEWERS);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.container, editViewerInfo);
-            ft.commit();
             adding = false;
         } else if (mViewers.size() == mNViewers) {
-            getViewerInfo(mViewers);
+            getViewerInfo(mViewers, true);
         } else {
+            getViewerInfo(mViewers, false);
             clearForm();
             okButton.setBackgroundResource(R.drawable.button_sm_deselected);
         }
@@ -207,8 +219,8 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     }
 
     private Viewer getViewer() {
-        String name = mNameEditText.getText().toString().trim();
-        String email = mEmailEditText.getText().toString().trim();
+        final String name = mNameEditText.getText().toString().trim();
+        final String email = mEmailEditText.getText().toString().trim();
 
         return new Viewer(name, email, mSessionId);
     }
@@ -223,6 +235,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
 
     // Container Activity must implement this interface
     public interface OnViewerInfoSubmittedListener {
-        void onViewerInfoSubmitted(ArrayList<Viewer> mViewers);
+        void onViewerInfoSubmitted(ArrayList<Viewer> mViewers, boolean completed);
     }
+
 }

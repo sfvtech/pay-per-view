@@ -98,6 +98,7 @@ public class ViewerAdapter extends BaseAdapter implements View.OnClickListener {
                     Log.v("Tag", "triggered here");
                     final Fragment editViewersFragment = new EditViewersFragment();
                     Bundle args = new Bundle();
+                    args.putBoolean("editing", true);
                     args.putParcelableArrayList("mViewers", viewerList);
                     args.putInt("MAX_VIEWERS", MAX_VIEWERS);
                     editViewersFragment.setArguments(args);

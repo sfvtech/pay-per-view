@@ -19,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.RelativeLayout;
@@ -40,17 +41,15 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         EditViewersFragment.onEditViewersFinishedListener {
 
     //public static final String EXTRA_VIEWERS = ViewerSurvey.PACKAGE + ":EXTRA_VIEWERS";
-    public static final String LOG_TAG = "ViewerInfoActivity";
+    public static final String LOG_TAG = "MainActivity";
     public static final int MY_PERMISSION_REQUEST_LOCATION = 100;
-
-    // Attributes
-    public static int MAX_VIEWERS = 0;
-    public static int mNViewers = 0;
-    public static ArrayList<Viewer> mViewers;
     public static String ID;
     public static double longitude;
     public static double latitude;
-
+    // Attributes
+    public int MAX_VIEWERS = 0;
+    public int mNViewers = 0;
+    public ArrayList<Viewer> mViewers;
     /**
      * Attachment download complete receiver.
      * 1. Receiver gets called once attachment download completed.
@@ -60,19 +59,19 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v("Tag: Received", "received");
-            String action = intent.getAction();
+            final String action = intent.getAction();
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
                 long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
                 Log.v("Tag: download ID", "" + downloadId);
-                DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                DownloadManager.Query query = new DownloadManager.Query();
+                final DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                final DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(downloadId);
                 Cursor cursor = null;
                 try {
                     cursor = downloadManager.query(query);
                     if (cursor.moveToFirst()) {
                         Log.v("Tag: cursormovetofirst", "" + downloadId);
-                        String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        final String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                         final String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uriString);
                         Log.v("Tag: uriString", uriString);
                         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                         Log.v("Tag: downloadstatus", "" + downloadStatus);
                         Log.v("Tag: uriString", uriString);
                         if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL)) {
-                            SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+                            final SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
                             if (fileExtension.equals(".mp4")) {
                                 preferences.edit().putString("localURIForVideo", uriString).apply();
                                 Log.v("TAG download local URI", uriString);
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         setContentView(R.layout.activity_main);
 
         // Trying to trigger database update
-        SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
+        final SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
         database.close();
 
         // Shared preferences to keep track of max viewers
@@ -132,18 +131,16 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
 
         getLocation();
 
-        Fragment viewerNumberFragment = new ViewerNumberFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        //this will clear the back stack and displays no animation on the screen
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.add(R.id.container, viewerNumberFragment);
-        ft.addToBackStack(null);
+        final Fragment viewerNumberFragment = new ViewerNumberFragment();
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.replace(R.id.container, viewerNumberFragment);
         ft.commit();
 
         // Add our magic buttons to the main activity layout
         mainRoot = (RelativeLayout) findViewById(R.id.main_root);
-        ViewHelper.addMagicMenuButtons(mainRoot);
+        final Bundle adminArgs = new Bundle();
+        ViewHelper.addMagicMenuButtons(mainRoot, ViewerNumberFragment.FRAGMENT_TAG, adminArgs);
     }
 
     @Override
@@ -162,95 +159,121 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     @Override
     public void onViewerNumberSelected(int nViewers) {
         mNViewers = nViewers;
-        Fragment viewerInfoFragment = new ViewerInfoFragment();
-        Bundle args = new Bundle();
+        final Fragment viewerInfoFragment = new ViewerInfoFragment();
+        final Bundle args = new Bundle();
         args.putInt("nViewers", nViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         viewerInfoFragment.setArguments(args);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        //this will clear the back stack and displays no animation on the screen
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerInfoFragment);
-        ft.addToBackStack(null);
         ft.commit();
+        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
     }
 
     @Override
-    public void onViewerInfoSubmitted(ArrayList<Viewer> mViewers) {
+    public void onViewerInfoSubmitted(ArrayList<Viewer> mViewers, boolean viewerInfoCompleted) {
         this.mViewers = mViewers;
-
-        // Go to video
-        Fragment videoFragment = new VideoFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        //this will clear the back stack and displays no animation on the screen
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.container, videoFragment);
-        ft.addToBackStack(null);
-        ft.commit();
+        final Bundle args = new Bundle();
+        args.putParcelableArrayList("mViewers", mViewers);
+        if (viewerInfoCompleted) {
+            // Go to video
+            final Fragment videoFragment = new VideoFragment();
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.container, videoFragment);
+            ft.commit();
+            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), VideoFragment.FRAGMENT_TAG, args);
+        } else {
+            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
+        }
     }
 
     @Override
     public void onVideoFinished() {
-        // Go to edit viewers
-        Log.v("TAG from video MAX", MAX_VIEWERS + "");
-        Fragment editViewersFragment = EditViewersFragment.create(mViewers, MAX_VIEWERS);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.executePendingTransactions();
-        //this will clear the back stack and displays no animation on the screen
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.container, editViewersFragment);
-        ft.addToBackStack(null);
-        ft.commit();
+        if (!mViewers.isEmpty()) {
+            // Go to survey
+            final Fragment surveyFragment = new SurveyFragment();
+            final Bundle args = new Bundle();
+            args.putParcelableArrayList("mViewers", mViewers);
+            surveyFragment.setArguments(args);
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.container, surveyFragment);
+            ft.commit();
+            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), SurveyFragment.FRAGMENT_TAG, args);
+        } else {
+            mViewers.clear();
+            final Fragment viewerNumberFragment = new ViewerNumberFragment();
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.container, viewerNumberFragment);
+            ft.commit();
+            final Bundle args = new Bundle();
+            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
+        }
     }
 
     @Override
-    public void onEditViewersFinished(ArrayList<Viewer> mViewers) {
+    public void onEditViewersFinished(ArrayList<Viewer> mViewers, String fragmentTag) {
         // Edit list of viewers
         this.mViewers = mViewers;
 
-        if (!mViewers.isEmpty()) {
-            // Go to survey
-            Fragment surveyFragment = new SurveyFragment();
-            Bundle args = new Bundle();
-            args.putParcelableArrayList("mViewers", mViewers);
-            surveyFragment.setArguments(args);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.executePendingTransactions();
-            //this will clear the back stack and displays no animation on the screen
-            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.container, surveyFragment);
-            ft.addToBackStack(null);
-            ft.commit();
+        // Go back to whatever we were doing...
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final Bundle args = new Bundle();
+        args.putParcelableArrayList("mViewers", mViewers);
+        args.putInt("nViewers", mNViewers);
+        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        final FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (!TextUtils.isEmpty(fragmentTag)) {
+            switch (fragmentTag) {
+                case SurveyFragment.FRAGMENT_TAG:
+                    final Fragment surveyFragment = new SurveyFragment();
+                    surveyFragment.setArguments(args);
+                    ft.replace(R.id.container, surveyFragment);
+                    ft.commit();
+                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), SurveyFragment.FRAGMENT_TAG, args);
+                    break;
+                case ViewerInfoFragment.FRAGMENT_TAG:
+                    final Fragment viewerInfoFragment = new ViewerInfoFragment();
+                    viewerInfoFragment.setArguments(args);
+                    ft.replace(R.id.container, viewerInfoFragment);
+                    ft.commit();
+                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
+                    break;
+                case ViewerNumberFragment.FRAGMENT_TAG:
+                    final Fragment viewerNumberFragment = new ViewerNumberFragment();
+                    ft.replace(R.id.container, viewerNumberFragment);
+                    ft.commit();
+                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
+                    break;
+                case VideoFragment.FRAGMENT_TAG:
+                    final Fragment videoFragment = new VideoFragment();
+                    ft.replace(R.id.container, videoFragment);
+                    ft.commit();
+                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), VideoFragment.FRAGMENT_TAG, args);
+                    break;
+                default:
+                    // If we don't know where it came from, restart
+                    onSessionFinished();
+                    break;
+            }
         } else {
-            mViewers.clear();
-            Fragment viewerNumberFragment = new ViewerNumberFragment();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.executePendingTransactions();
-            //this will clear the back stack and displays no animation on the screen
-            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.add(R.id.container, viewerNumberFragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            onSessionFinished();
         }
     }
 
     @Override
     public void onSurveyFinished() {
         // Go to thank you
-        Fragment thankYouFragment = new ThankYouFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.executePendingTransactions();
-        //this will clear the back stack and displays no animation on the screen
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
+        final Fragment thankYouFragment = new ThankYouFragment();
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, thankYouFragment);
-        ft.addToBackStack(null);
         ft.commit();
+        final Bundle args = new Bundle();
+        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ThankYouFragment.FRAGMENT_TAG, args);
     }
 
     @Override
@@ -258,14 +281,15 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         // Restart with viewer numbers
         mViewers.clear();
         mNViewers = 0;
-        Fragment viewerNumberFragment = new ViewerNumberFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        //this will clear the back stack and displays no animation on the screen
-        // fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = fragmentManager.beginTransaction();
+        final Bundle args = new Bundle();
+        args.putParcelableArrayList("mViewers", mViewers);
+        final Fragment viewerNumberFragment = new ViewerNumberFragment();
+        viewerNumberFragment.setArguments(args);
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerNumberFragment);
-        ft.addToBackStack(null);
         ft.commit();
+        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
     }
 
     @Override
