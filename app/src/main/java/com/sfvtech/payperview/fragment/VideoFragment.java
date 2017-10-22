@@ -40,10 +40,10 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_video, container, false);
-        SurfaceView mSurface = (SurfaceView) v.findViewById(R.id.video_surface);
+        final View v = inflater.inflate(R.layout.fragment_video, container, false);
+        final SurfaceView mSurface = (SurfaceView) v.findViewById(R.id.video_surface);
         subtitleView = (SubtitleView) v.findViewById(R.id.subs_box);
-        SurfaceHolder mSurfaceHolder = mSurface.getHolder();
+        final SurfaceHolder mSurfaceHolder = mSurface.getHolder();
         mSurfaceHolder.addCallback(this);
         mPlayer.setSubtitleView(subtitleView);
         mPlayer.setSurface(mSurfaceHolder);
@@ -81,6 +81,7 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        mPlayer.stop();
     }
 
     // Container Activity must implement this interface

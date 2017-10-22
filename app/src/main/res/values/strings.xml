@@ -83,5 +83,8 @@
     <string name="add_new_viewer" translatable="true">Add New</string>
     <string name="restart_from_viewers" translatable="true">Restart</string>
 
+    <string name="correct_email_confirmation">%1$s, is this your correct email?</string>
+    <string name="back_to_admin">Back to admin</string>
+
 
 </resources>

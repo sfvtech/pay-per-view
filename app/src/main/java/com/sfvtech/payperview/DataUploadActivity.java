@@ -1,8 +1,10 @@
 package com.sfvtech.payperview;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -13,6 +15,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,18 +31,25 @@ import com.sfvtech.payperview.database.DatabaseHelper;
 import com.sfvtech.payperview.fragment.AdminFragment;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DataUploadActivity extends Activity {
+public class DataUploadActivity extends Activity implements View.OnClickListener {
 
+    public static final int MY_PERMISSION_REQUEST_STORAGE = 101;
     private final String LOG_TAG = "DataUploadActivity";
     long mRecordsToUpload = 0;
     boolean mIsClientOnline = false;
     boolean mIsServerResponsive = false;
+    Button emailButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +73,9 @@ public class DataUploadActivity extends Activity {
             networkStatusView.setText(getString(R.string.network_status_online));
         }
 
+        emailButton = findViewById(R.id.emailButton);
+        emailButton.setOnClickListener(this);
+
         // See if we can resolve the upload endpoint
         new CheckServerStatus().execute(getString(R.string.upload_endpoint_url));
     }
@@ -70,6 +85,17 @@ public class DataUploadActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.data_upload, menu);
         return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.emailButton:
+                sendDataToEmail();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -84,6 +110,77 @@ public class DataUploadActivity extends Activity {
     public void uploadData(View view) {
         String csv = getNewRecordsAsCsv();
         new PostData().execute(getString(R.string.upload_endpoint_url), csv);
+    }
+
+    public Uri prepareCSVForEmail() {
+        final String csv = getNewRecordsAsCsv();
+        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        final File csvFile = new File(
+                Environment.getExternalStorageDirectory(), "data" + timeStamp + ".csv");
+
+        try {
+            final FileOutputStream stream = new FileOutputStream(csvFile);
+            stream.write(csv.getBytes());
+            stream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Uri.fromFile(csvFile);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_STORAGE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    sendDataToEmail();
+
+                } else {
+                    Toast.makeText(this, "Need storage permissions to send CSV by email", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+        }
+    }
+
+    public void sendDataToEmail() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, DataUploadActivity.MY_PERMISSION_REQUEST_STORAGE);
+            return;
+        }
+
+        Uri savedCSV = prepareCSVForEmail();
+        if (savedCSV != null) {
+            final File file = new File(savedCSV.getPath());
+            Uri contentUri = null;
+            try {
+                contentUri = FileProvider.getUriForFile(this, "com.sfvtech.payperview.fileprovider", file);
+            } catch (IllegalArgumentException e) {
+                Log.e("Tag", "The selected file can't be shared");
+            }
+            if (contentUri != null) {
+                final Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                i.putExtra(Intent.EXTRA_TEXT, "Body");
+                // TODO add ability to add preferred email to preferences
+                i.putExtra(Intent.EXTRA_STREAM, contentUri);
+                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     /**
@@ -298,7 +395,6 @@ public class DataUploadActivity extends Activity {
                         .appendQueryParameter("installation_id", installationId)
                         .appendQueryParameter("data", data)
                         .appendQueryParameter("version", Integer.toString(getApplicationVersionNumber()));
-                // @todo add GPS data
                 String query = builder.build().getEncodedQuery();
 
                 OutputStream os = urlConnection.getOutputStream();
