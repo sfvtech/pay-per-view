@@ -170,6 +170,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         args.putParcelableArrayList("mViewers", mViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         args.putInt("nViewers", nViewers);
+        Log.v("AdminFragment:FragTag", fragmentTag);
         switch (fragmentTag) {
             case ViewerNumberFragment.FRAGMENT_TAG:
                 final Fragment viewerNumberFragment = new ViewerNumberFragment();
@@ -203,11 +204,13 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 break;
             case ThankYouFragment.FRAGMENT_TAG:
             default:
+                // we don't know where we came from... so restart
                 restart();
         }
     }
 
     private void restart() {
+        Log.v(AdminFragment.FRAGMENT_TAG, "Restart Called");
         final Fragment viewerNumberFragment = new ViewerNumberFragment();
         final Bundle restartArgs = new Bundle();
         restartArgs.putParcelableArrayList("mViewers", new ArrayList<Viewer>());

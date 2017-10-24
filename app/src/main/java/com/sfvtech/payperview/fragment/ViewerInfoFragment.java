@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,8 @@ import com.mobsandgeeks.saripaar.annotation.Required;
 import com.mobsandgeeks.saripaar.annotation.TextRule;
 import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
+import com.sfvtech.payperview.ViewHelper;
 import com.sfvtech.payperview.Viewer;
-import com.sfvtech.payperview.ViewerSurvey;
 import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
 
@@ -31,17 +33,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class ViewerInfoFragment extends Fragment implements Validator.ValidationListener {
+public class ViewerInfoFragment extends Fragment implements Validator.ValidationListener, View.OnClickListener {
 
     // Constants
-    public static final String EXTRA_VIEWERS = ViewerSurvey.PACKAGE + ":EXTRA_VIEWERS";
-    public static final String LOG_TAG = "ViewerInfoActivity";
     public static final String FRAGMENT_TAG = "viewer-info";
-
+    private static final long MAGIC_BUTTON_MAX_MS = 2000; // milliseconds
     // UI References
     @Required(order = 1, messageResId = R.string.message_required)
     @TextRule(order = 2, minLength = 2, messageResId = R.string.message_name_too_short)
-
     //@todo make spaces valid in names.  Rename field hint to First Name
     @Regex(order = 3, patternResId = R.string.pattern_name, messageResId = R.string.message_invalid_name)
     EditText mNameEditText;
@@ -49,9 +48,10 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     @Email(order = 5, messageResId = R.string.message_invalid_email)
     EditText mEmailEditText;
     ViewerInfoFragment.OnViewerInfoSubmittedListener mCallback;
-
+    Date mTimerStart;
+    int mLastButtonIndex = -1;
     // Attributes
-    private int mNViewers;
+    private int nViewers;
     private ArrayList<Viewer> mViewers;
     private Validator mValidator;
     private TextView mViewerSalutation;
@@ -63,6 +63,11 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     private int MAX_VIEWERS;
     private String fragmentTag;
     private Bundle args;
+    private String savedName;
+    private String savedEmail;
+    private Button button1;
+    private Button button2;
+    private Button button3;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,7 +101,9 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mSessionId = newRowId;
 
         // Extras
-        mNViewers = getArguments().getInt("nViewers");
+        if (args.containsKey("nViewers")) {
+            nViewers = getArguments().getInt("nViewers");
+        }
         mViewers = new ArrayList<Viewer>();
 
         // UI References
@@ -105,18 +112,25 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mNameEditText = (EditText) view.findViewById(R.id.nameEditText);
         mEmailEditText = (EditText) view.findViewById(R.id.emailEditText);
 
+        if (savedInstanceState != null) {
+            nViewers = savedInstanceState.getInt("nViewers");
+            editViewer = savedInstanceState.getParcelable("Viewer");
+            MAX_VIEWERS = savedInstanceState.getInt("MAX_VIEWERS");
+            fragmentTag = savedInstanceState.getString("fragmentTag");
+            mViewers = savedInstanceState.getParcelableArrayList("mViewers");
+            editing = savedInstanceState.getBoolean("editing");
+            adding = savedInstanceState.getBoolean("adding");
+            savedName = savedInstanceState.getString("savedName");
+            savedEmail = savedInstanceState.getString("savedEmail");
+        }
 
-        // Make sure soft keyboard pops up when Name has focus
-        mNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (hasFocus) {
-                    imm.showSoftInput(mNameEditText, InputMethodManager.SHOW_IMPLICIT);
-                }
-            }
-        });
-        mNameEditText.requestFocus();
+        if (!TextUtils.isEmpty(savedName)) {
+            mNameEditText.setText(savedName);
+        }
+
+        if (!TextUtils.isEmpty(savedEmail)) {
+            mEmailEditText.setText(savedEmail);
+        }
 
         if (args.containsKey("Viewer")) {
             editViewer = args.getParcelable("Viewer");
@@ -133,12 +147,12 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
                 editing = true;
             }
         }
+
         if (args.containsKey("adding")) {
             if (args.getBoolean("adding")) {
                 adding = true;
             }
         }
-
 
         if (args.containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
@@ -156,6 +170,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mValidator = new Validator(this);
         mValidator.setValidationListener(this);
 
+
         okButton = (Button) view.findViewById(R.id.okButton);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,7 +180,30 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             }
         });
 
+        button1 = view.findViewById(R.id.button1);
+        button2 = view.findViewById(R.id.button2);
+        button3 = view.findViewById(R.id.button3);
+        button1.setOnClickListener(this);
+        button2.setOnClickListener(this);
+        button3.setOnClickListener(this);
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Make sure soft keyboard pops up when Name has focus
+        mNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (hasFocus) {
+                    imm.showSoftInput(mNameEditText, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }
+        });
+        mNameEditText.requestFocus();
     }
 
     @Override
@@ -185,13 +223,16 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
 
     @Override
     public void onValidationSucceeded() {
+        Log.v("tag", "Validated");
         mViewers.add(getViewer());
         final Bundle args = new Bundle();
         args.putParcelable("editedViewer", getViewer());
         args.putParcelableArrayList("mViewers", mViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         args.putString("fragmentTag", fragmentTag);
+        args.putInt("nViewers", nViewers);
         if (editing || adding) {
+            Log.v("ViewerInfo", "editing or adding");
             final Fragment editViewerInfo = new EditViewersFragment();
             editViewerInfo.setArguments(args);
             final FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -199,7 +240,7 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             ft.commit();
             editing = false;
             adding = false;
-        } else if (mViewers.size() == mNViewers) {
+        } else if (mViewers.size() == nViewers) {
             getViewerInfo(mViewers, true);
         } else {
             getViewerInfo(mViewers, false);
@@ -233,9 +274,73 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         mNameEditText.requestFocus();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (editViewer != null) {
+            outState.putParcelable("Viewer", editViewer);
+        }
+        outState.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        if (fragmentTag != null) {
+            outState.putString("fragmentTag", fragmentTag);
+            Log.v("ViewerInfo:fragmentTag", fragmentTag);
+        }
+        if (mViewers != null) {
+            outState.putParcelableArrayList("mViewers", mViewers);
+        }
+        outState.putString("savedName", mNameEditText.getText().toString());
+        outState.putString("savedEmail", mEmailEditText.getText().toString());
+        outState.putBoolean("editing", editing);
+        outState.putBoolean("adding", adding);
+        outState.putInt("nViewers", nViewers);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.button1:
+                mTimerStart = new Date();
+                mLastButtonIndex = 0;
+                break;
+            case R.id.button2:
+                if (mLastButtonIndex == 0) {
+                    mLastButtonIndex = 1;
+                } else {
+                    mLastButtonIndex = -1;
+                }
+                break;
+            case R.id.button3:
+                if (mLastButtonIndex == 1) {
+                    long interval = new Date().getTime() - mTimerStart.getTime();
+                    if (interval < MAGIC_BUTTON_MAX_MS) {
+                        Bundle args = new Bundle();
+                        if (editViewer != null) {
+                            args.putParcelable("Viewer", editViewer);
+                        }
+                        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+                        if (fragmentTag != null) {
+                            args.putString("fragmentTag", fragmentTag);
+                            Log.v("ViewerInfo:fragmentTag", fragmentTag);
+                        }
+                        if (mViewers != null) {
+                            args.putParcelableArrayList("mViewers", mViewers);
+                        }
+                        args.putString("savedName", mNameEditText.getText().toString());
+                        args.putString("savedEmail", mEmailEditText.getText().toString());
+                        args.putBoolean("editing", editing);
+                        args.putBoolean("adding", adding);
+                        args.putInt("nViewers", nViewers);
+                        ViewHelper.startAdminFragment(getContext(), FRAGMENT_TAG, args);
+                    }
+                }
+                // Reset the button tracker
+                mLastButtonIndex = -1;
+                break;
+        }
+    }
+
     // Container Activity must implement this interface
     public interface OnViewerInfoSubmittedListener {
         void onViewerInfoSubmitted(ArrayList<Viewer> mViewers, boolean completed);
     }
-
 }

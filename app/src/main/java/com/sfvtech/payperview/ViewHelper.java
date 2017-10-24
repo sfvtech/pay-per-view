@@ -30,6 +30,7 @@ public class ViewHelper {
      * @param layout Layout to attach buttons to.
      */
     public static void initializeMagicMenuButtons(View layout, final String currentFragmentTag, final Bundle adminArgs) {
+        Log.v("initalizeMagicButtons", "Called");
         final ViewGroup myLayout = (ViewGroup) layout;
         final Button buttons[] = new Button[3];
 
@@ -52,7 +53,7 @@ public class ViewHelper {
                     if (mLastButtonIndex == 1) {
                         long interval = new Date().getTime() - mTimerStart.getTime();
                         if (interval < MAGIC_BUTTON_MAX_MS) {
-                            startAdminFragment(myLayout, currentFragmentTag, adminArgs);
+                            startAdminFragment(myLayout.getContext(), currentFragmentTag, adminArgs);
                         }
                     }
                     // Reset the button tracker
@@ -62,9 +63,13 @@ public class ViewHelper {
         };
 
         int left = layout.getLeft();
+        Log.v("initalizeMagic:left", "" + left);
         int top = layout.getTop();
+        Log.v("initalizeMagic:top", "" + top);
         int right = layout.getRight();
+        Log.v("initalizeMagic:right", "" + right);
         int bottom = layout.getBottom();
+        Log.v("initalizeMagic:bottom", "" + bottom);
 
         for (int i = 0; i < 3; i++) {
             buttons[i] = new Button(layout.getContext());
@@ -97,11 +102,48 @@ public class ViewHelper {
         }
     }
 
-    protected static void startAdminFragment(View v, String currentFragmentTag, Bundle adminArgs) {
+    public static void setListener(final Button[] buttons, final String currentFragmentTag, final Bundle adminArgs, final Context context) {
+
+        for (int i = 0; i < 3; i++) {
+            buttons[i].setOnClickListener(new View.OnClickListener() {
+                Date mTimerStart;
+                int mLastButtonIndex = -1;
+
+                @Override
+                public void onClick(View v) {
+                    if (v.getId() == buttons[0].getId()) {
+                        Log.v("View", "0");
+                        mTimerStart = new Date();
+                        mLastButtonIndex = 0;
+                    } else if (v.getId() == buttons[1].getId()) {
+                        Log.v("View", "1");
+                        if (mLastButtonIndex == 0) {
+                            mLastButtonIndex = 1;
+                        } else {
+                            mLastButtonIndex = -1;
+                        }
+                    } else if (v.getId() == buttons[2].getId()) {
+                        Log.v("View", "2");
+                        if (mLastButtonIndex == 1) {
+                            long interval = new Date().getTime() - mTimerStart.getTime();
+                            if (interval < MAGIC_BUTTON_MAX_MS) {
+                                startAdminFragment(context, currentFragmentTag, adminArgs);
+                            }
+                        }
+                        // Reset the button tracker
+                        mLastButtonIndex = -1;
+                    }
+                }
+            });
+        }
+    }
+
+    public static void startAdminFragment(Context context, String currentFragmentTag, Bundle adminArgs) {
+        Log.v("View", "startAdmin");
         final Fragment adminFragment = new AdminFragment();
         adminArgs.putString("fragmentTag", currentFragmentTag);
         adminFragment.setArguments(adminArgs);
-        ((AppCompatActivity) v.getContext()).getSupportFragmentManager().
+        ((AppCompatActivity) context).getSupportFragmentManager().
                 beginTransaction().replace(R.id.container, adminFragment, AdminFragment.FRAGMENT_TAG).
                 commit();
     }
@@ -119,6 +161,7 @@ public class ViewHelper {
                                        int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 // Ignore event if the layout isn't complete
                 if (right == 0 && bottom == 0) {
+                    Log.v("ViewHelper", "Layout not complete");
                     return;
                 }
                 initializeMagicMenuButtons(v, currentFragmentTag, adminArgs);
@@ -127,13 +170,13 @@ public class ViewHelper {
         });
     }
 
-    public static void removeMagicButtons(View layout, Context context) {
+    public static void removeMagicButtons(View layout) {
         final ViewGroup myLayout = (ViewGroup) layout;
         myLayout.removeAllViews();
     }
 
-    public static void updateMagicButtons(View layout, Context context, String fragmentTag, Bundle adminArgs) {
-        removeMagicButtons(layout, context);
-        initializeMagicMenuButtons(layout, fragmentTag, adminArgs);
+    public static void updateMagicButtons(View layout, String fragmentTag, Bundle adminArgs) {
+        removeMagicButtons(layout);
+        addMagicMenuButtons(layout, fragmentTag, adminArgs);
     }
 }

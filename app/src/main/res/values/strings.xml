@@ -85,6 +85,7 @@
 
     <string name="correct_email_confirmation">%1$s, is this your correct email?</string>
     <string name="back_to_admin">Back to admin</string>
+    <string name="yes">Yes</string>
 
 
 </resources>

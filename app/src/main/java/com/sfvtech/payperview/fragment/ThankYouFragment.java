@@ -55,6 +55,7 @@ public class ThankYouFragment extends Fragment {
         void onSessionFinished();
     }
 
+    // TODO this causes issues... Can we just do a restart button? Or disable admin menu in thank you fragment?
     private class MyTimerTask extends TimerTask {
         @Override
         public void run() {

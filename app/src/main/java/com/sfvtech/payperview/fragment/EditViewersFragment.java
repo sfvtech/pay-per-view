@@ -68,6 +68,11 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (savedInstanceState != null) {
+            mViewers = savedInstanceState.getParcelableArrayList("mViewers");
+            MAX_VIEWERS = savedInstanceState.getInt("MAX_VIEWERS");
+        }
+
         if (getArguments().containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
@@ -113,6 +118,8 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                     break;
                 case SurveyFragment.FRAGMENT_TAG:
                     addNewButton.setVisibility(View.GONE);
+                    break;
+                default:
                     break;
             }
         }
@@ -160,6 +167,13 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("mViewers", mViewers);
+        outState.putInt("MAX_VIEWERS", MAX_VIEWERS);
     }
 
     // Container Activity must implement this interface

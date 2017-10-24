@@ -330,7 +330,6 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         // @todo require https URLs by default, but allow for configurable (insecure) override
         protected Boolean doInBackground(String... params) {
             try {
-                // @todo refactor to use HttpURLConnection instead. HttpClient is @deprecated
                 URL urlObj = new URL(params[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) urlObj.openConnection();
                 urlConnection.setReadTimeout(10000); // 10 seconds
