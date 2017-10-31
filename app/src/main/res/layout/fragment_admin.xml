@@ -11,23 +11,29 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/title_activity_admin" />
 
-    <Button
-        android:id="@+id/adminRestartButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="handleRestart"
-        android:text="@string/admin_restart_button" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/adminUploadButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="handleUpload"
-        android:text="@string/admin_upload_button" />
+        <Button
+            android:id="@+id/adminRestartButton"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="handleRestart"
+            android:text="@string/admin_restart_button" />
+
+        <Button
+            android:id="@+id/adminUploadButton"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="handleUpload"
+            android:text="@string/admin_upload_button" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/adminCancelButton"
@@ -40,13 +46,23 @@
         android:text="@string/admin_cancel_button" />
 
     <Button
+        android:id="@+id/adminOpenPreferences"
+        style="@style/AdminButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="0dp"
+        android:onClick="handleCancel"
+        android:text="@string/open_preferences" />
+
+    <Button
         android:id="@+id/adminEditViewers"
         style="@style/AdminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="0dp"
-        android:text="Edit Viewers" />
+        android:text="@string/edit_viewers" />
 
     <LinearLayout
         android:id="@+id/change_viewer_number"

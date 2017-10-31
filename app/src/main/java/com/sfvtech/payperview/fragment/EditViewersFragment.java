@@ -136,7 +136,6 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 args.putParcelableArrayList("mViewers", mViewers);
                 args.putInt("MAX_VIEWERS", MAX_VIEWERS);
                 args.putString("fragmentTag", fragmentTag);
-                args.putBoolean("adding", true);
                 viewerInfoFragment.setArguments(args);
                 ((AppCompatActivity) getContext()).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).
