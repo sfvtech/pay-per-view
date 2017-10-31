@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                         final String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uriString);
                         Log.v("Tag: uriString", uriString);
                         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                        // final String fileName = URLUtil.guessFileName(Uri.decode(localUri), null, mimeType);
+                        //final String fileName = URLUtil.guessFileName(Uri.decode(localUri), null, mimeType);
                         //final Uri uriForFile = FileProvider.getUriForFile(context, "com.sfvtech.payperview" + FILE_PROVIDER_EXTENSION, file);
                         int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                         Log.v("Tag: downloadstatus", "" + downloadStatus);

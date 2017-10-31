@@ -58,7 +58,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
     private Validator mValidator;
     private Button surveyOption5;
     private Button emailConfirmButton;
-    private boolean currentViewerValidatedEmail;
 
     @Required(order = 4, messageResId = R.string.message_required)
     @Email(order = 5, messageResId = R.string.message_invalid_email)
@@ -84,22 +83,10 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
             if (savedInstanceState.containsKey("mViewers")) {
                 mViewers = savedInstanceState.getParcelableArrayList("mViewers");
             }
-            if (savedInstanceState.containsKey("mCurrentViewer")) {
-                mCurrentViewer = savedInstanceState.getParcelable("mCurrentViewer");
-            }
-            if (savedInstanceState.containsKey("currentViewerValidatedEmail")) {
-                currentViewerValidatedEmail = savedInstanceState.getBoolean("currentViewerValidatedEmail");
-            }
         } else {
             Bundle args = getArguments();
             if (args.containsKey("mViewers")) {
                 mViewers = args.getParcelableArrayList("mViewers");
-            }
-            if (args.containsKey("mCurrentViewer")) {
-                mCurrentViewer = args.getParcelable("mCurrentViewer");
-            }
-            if (args.containsKey("currentViewerValidatedEmail")) {
-                currentViewerValidatedEmail = args.getBoolean("currentViewerValidatedEmail");
             }
         }
 
@@ -152,7 +139,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
     public void onValidationSucceeded() {
         Log.v("tag", "Validated");
         mCurrentViewer.setEmail(emailTextView.getText().toString());
-        currentViewerValidatedEmail = true;
         Log.v("tag", mCurrentViewer.getEmail());
         emailConfirmButton.setVisibility(View.GONE);
         emailQuestion.setVisibility(View.GONE);
@@ -173,7 +159,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
 
     @Override
     public void onValidationFailed(View failedView, Rule<?> failedRule) {
-        currentViewerValidatedEmail = false;
         // Reset the OK button's appearance
         emailConfirmButton.setBackgroundResource(R.drawable.button_sm_deselected);
         if (failedView instanceof EditText) {
@@ -196,19 +181,13 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
     private void incrementViewer() {
         mLayout.requestFocus();
         mCurrentViewer = mViewersIterator.next();
+        // Replace the name placeholder in the title
+        Resources res = getResources();
+        emailTextView.setText(mCurrentViewer.getEmail());
+        emailQuestion.setText(String.format(res.getString(R.string.correct_email_confirmation), mCurrentViewer.getName()));
+        mSurveyTitle.setText(String.format(res.getString(R.string.survey_question), mCurrentViewer.getName()));
 
-        if (currentViewerValidatedEmail) {
-            Log.v("SurveyFrag", "Coming back after email");
-            middleSurvey();
-        } else {
-            // Replace the name placeholder in the title
-            Resources res = getResources();
-            emailTextView.setText(mCurrentViewer.getEmail());
-            emailQuestion.setText(String.format(res.getString(R.string.correct_email_confirmation), mCurrentViewer.getName()));
-            mSurveyTitle.setText(String.format(res.getString(R.string.survey_question), mCurrentViewer.getName()));
-
-            deselectAllButtons();
-        }
+        deselectAllButtons();
     }
 
     @Override
@@ -247,7 +226,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
                 if (mViewersIterator.hasNext()) {
                     incrementViewer();
                     surveyChoice = "";
-                    currentViewerValidatedEmail = false;
                     emailConfirmButton.setVisibility(View.VISIBLE);
                     emailQuestion.setVisibility(View.VISIBLE);
                     emailTextView.setVisibility(View.VISIBLE);
@@ -358,10 +336,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         if (mViewers != null) {
             outState.putParcelableArrayList("mViewers", mViewers);
         }
-        if (mCurrentViewer != null) {
-            outState.putParcelable("mCurrentViewer", mCurrentViewer);
-        }
-        outState.putBoolean("currentViewerValidatedEmail", currentViewerValidatedEmail);
     }
 
     // Container Activity must implement this interface
