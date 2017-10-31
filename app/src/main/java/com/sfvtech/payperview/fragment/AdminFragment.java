@@ -26,7 +26,6 @@ import com.sfvtech.payperview.DataUploadActivity;
 import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
 import com.sfvtech.payperview.Viewer;
-import com.sfvtech.payperview.ViewerSurvey;
 import com.sfvtech.payperview.utils.DownloadUtils;
 
 import java.util.ArrayList;

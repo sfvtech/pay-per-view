@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         SurveyFragment.OnSurveyFinishedListener, ThankYouFragment.OnSessionFinishedListener,
         EditViewersFragment.onEditViewersFinishedListener {
 
-    //public static final String EXTRA_VIEWERS = ViewerSurvey.PACKAGE + ":EXTRA_VIEWERS";
     public static final String LOG_TAG = "MainActivity";
     public static final int MY_PERMISSION_REQUEST_LOCATION = 100;
     public static String ID;

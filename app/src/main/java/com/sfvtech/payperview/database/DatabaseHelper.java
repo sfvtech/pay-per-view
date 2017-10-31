@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_SESSION_TABLE);
         db.execSQL(SQL_CREATE_VIEWER_TABLE);
     }
-
+    
     /**
      * This will be the SQL necessary to migrate existing data to a new version. Will be
      * triggered when DATABASE_VERSION is greater than the version used to create
