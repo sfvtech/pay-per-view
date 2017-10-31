@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sfvtech.payperview.DataUploadActivity;
+import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
 import com.sfvtech.payperview.Viewer;
 import com.sfvtech.payperview.ViewerSurvey;
@@ -37,8 +38,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
 
     public static final String EXTRA_INSTALLATION_ID = ViewerSurvey.PACKAGE + "EXTRA_INSTALLATION_ID";
     public static final String FRAGMENT_TAG = "AdminFragment";
-
-    private String mInstallationId;
+    final String installationId = MainActivity.ID;
     private Button cancelButton;
     private Button restartButton;
     private Button uploadButton;
@@ -65,10 +65,6 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         final View v = inflater.inflate(R.layout.fragment_admin, container, false);
 
-        // Set up metadata display
-        if (getArguments().containsKey("ID")) {
-            mInstallationId = getArguments().getString("ID");
-        }
         if (getArguments().containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
@@ -83,7 +79,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         }
 
         final TextView installationIdView = (TextView) v.findViewById(R.id.installationIdValue);
-        installationIdView.setText(mInstallationId);
+        installationIdView.setText(installationId);
 
         cancelButton = (Button) v.findViewById(R.id.adminCancelButton);
         cancelButton.setOnClickListener(this);
@@ -183,7 +179,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
 
     public void handleUpload() {
         final Intent intent = new Intent(getActivity(), DataUploadActivity.class);
-        intent.putExtra(EXTRA_INSTALLATION_ID, mInstallationId);
+        intent.putExtra(EXTRA_INSTALLATION_ID, installationId);
         startActivity(intent);
     }
 

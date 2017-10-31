@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
 import com.sfvtech.payperview.ViewHelper;
 
@@ -40,7 +39,6 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_viewer_number, container, false);
 
-        final String installationId = MainActivity.ID;
         final LinearLayout buttonLayout = (LinearLayout) view.findViewById(R.id.buttonLayout);
 
         // UI References
