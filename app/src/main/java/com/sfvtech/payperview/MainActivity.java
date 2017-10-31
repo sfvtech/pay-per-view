@@ -284,6 +284,9 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
 
     @Override
     public void onEditViewersFinished(ArrayList<Viewer> mViewers, String fragmentTag) {
+        if (!TextUtils.isEmpty(fragmentTag)) {
+            Log.v("EditViewerFinished", fragmentTag);
+        }
         // Edit list of viewers
         this.mViewers = mViewers;
         this.nViewers = mViewers.size();
@@ -328,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                     break;
                 default:
                     // If we don't know where it came from, restart
+                    Log.v("Onedit", "don't know where it came from");
                     onSessionFinished();
                     break;
             }
@@ -347,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         currentFragmentTag = ThankYouFragment.FRAGMENT_TAG;
         final Bundle args = new Bundle();
         // Disable magic buttons for Thank You Fragment
-        // ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ThankYouFragment.FRAGMENT_TAG, args);
     }
 
     @Override

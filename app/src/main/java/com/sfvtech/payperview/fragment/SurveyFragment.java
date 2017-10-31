@@ -282,10 +282,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
                         if (mViewers != null) {
                             args.putParcelableArrayList("mViewers", mViewers);
                         }
-                        if (mCurrentViewer != null) {
-                            args.putParcelable("mCurrentViewer", mCurrentViewer);
-                        }
-                        args.putBoolean("currentViewerValidatedEmail", currentViewerValidatedEmail);
                         ViewHelper.startAdminFragment(getContext(), FRAGMENT_TAG, args);
                     }
                 }

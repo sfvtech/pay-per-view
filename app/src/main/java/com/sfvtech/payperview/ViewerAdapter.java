@@ -24,11 +24,13 @@ public class ViewerAdapter extends BaseAdapter implements View.OnClickListener {
     private ArrayList<Viewer> viewerList = new ArrayList<Viewer>();
     private Context context;
     private int MAX_VIEWERS;
+    private String fragmentTag;
 
-    public ViewerAdapter(Context context, ArrayList<Viewer> viewers, int MAX_VIEWERS) {
+    public ViewerAdapter(Context context, ArrayList<Viewer> viewers, int MAX_VIEWERS, String fragmentTag) {
         this.viewerList = viewers;
         this.context = context;
         this.MAX_VIEWERS = MAX_VIEWERS;
+        this.fragmentTag = fragmentTag;
     }
 
     @Override
@@ -101,6 +103,7 @@ public class ViewerAdapter extends BaseAdapter implements View.OnClickListener {
                     args.putBoolean("editing", true);
                     args.putParcelableArrayList("mViewers", viewerList);
                     args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+                    args.putString("fragmentTag", fragmentTag);
                     editViewersFragment.setArguments(args);
                     ((AppCompatActivity) context).getSupportFragmentManager().
                             beginTransaction().replace(R.id.container, editViewersFragment, EditViewersFragment.FRAGMENT_TAG).
@@ -113,8 +116,10 @@ public class ViewerAdapter extends BaseAdapter implements View.OnClickListener {
                 final Fragment viewerInfoFragment = new ViewerInfoFragment();
                 Bundle args = new Bundle();
                 args.putParcelableArrayList("mViewers", viewerList);
+                args.putBoolean("editing", true);
                 args.putInt("MAX_VIEWERS", MAX_VIEWERS);
                 args.putParcelable("Viewer", viewer);
+                args.putString("fragmentTag", fragmentTag);
                 viewerInfoFragment.setArguments(args);
                 ((AppCompatActivity) context).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).

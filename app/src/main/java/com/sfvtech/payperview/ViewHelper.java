@@ -139,9 +139,9 @@ public class ViewHelper {
     }
 
     public static void startAdminFragment(Context context, String currentFragmentTag, Bundle adminArgs) {
-        Log.v("View", "startAdmin");
+        Log.v("View", "startAdminfrom" + currentFragmentTag);
         final Fragment adminFragment = new AdminFragment();
-        adminArgs.putString("fragmentTag", currentFragmentTag);
+        adminArgs.putString(context.getString(R.string.fragmentTag), currentFragmentTag);
         adminFragment.setArguments(adminArgs);
         ((AppCompatActivity) context).getSupportFragmentManager().
                 beginTransaction().replace(R.id.container, adminFragment, AdminFragment.FRAGMENT_TAG).

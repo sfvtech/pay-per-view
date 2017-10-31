@@ -82,6 +82,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
         }
         if (getArguments().containsKey("fragmentTag")) {
             fragmentTag = getArguments().getString("fragmentTag");
+            Log.v("EditViewer", fragmentTag);
         }
 
         Log.v("MAX ON CREATE", MAX_VIEWERS + "");
@@ -91,7 +92,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
 
         // Inflate list of viewers
         listView = v.findViewById(R.id.list);
-        myAdapter = new ViewerAdapter(getContext(), mViewers, MAX_VIEWERS);
+        myAdapter = new ViewerAdapter(getContext(), mViewers, MAX_VIEWERS, fragmentTag);
         listView.setAdapter(myAdapter);
 
         confirmButton = (Button) v.findViewById(R.id.confirm);
@@ -143,6 +144,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 break;
             case R.id.confirm:
                 mCallback.onEditViewersFinished(mViewers, fragmentTag);
+                Log.v("mViewers string edit", mViewers.toString());
                 break;
             case R.id.restartButton:
                 final Fragment viewerNumberFragment = new ViewerNumberFragment();

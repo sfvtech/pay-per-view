@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -105,8 +106,22 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         editViewersButton = (Button) v.findViewById(R.id.adminEditViewers);
         editViewersButton.setOnClickListener(this);
 
-        if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG)) {
+        if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG) || fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) || fragmentTag.equals(VideoFragment.FRAGMENT_TAG)) {
             editViewersButton.setVisibility(View.GONE);
+        }
+
+        LinearLayout changeViewerNumber = v.findViewById(R.id.change_viewer_number);
+        if (fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) && nViewers != MAX_VIEWERS) {
+            changeViewerNumber.setVisibility(View.VISIBLE);
+            if (nViewers == 1) {
+                Button button2 = v.findViewById(R.id.adminChangeViewerNumber2);
+                Button button3 = v.findViewById(R.id.adminChangeViewerNumber3);
+                button2.setOnClickListener(this);
+                button3.setOnClickListener(this);
+                if (nViewers == 2) {
+                    button2.setVisibility(View.GONE);
+                }
+            }
         }
 
         final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
@@ -153,6 +168,14 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 ((AppCompatActivity) getContext()).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, editViewersFragment, EditViewersFragment.FRAGMENT_TAG).
                         commit();
+                break;
+            case R.id.adminChangeViewerNumber2:
+                nViewers = 2;
+                handleCancel();
+                break;
+            case R.id.adminChangeViewerNumber3:
+                nViewers = 3;
+                handleCancel();
                 break;
 
         }

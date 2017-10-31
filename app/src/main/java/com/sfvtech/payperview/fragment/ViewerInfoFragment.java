@@ -59,7 +59,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
     private Button okButton;
     private Viewer editViewer;
     private boolean editing;
-    private boolean adding;
     private int MAX_VIEWERS;
     private String fragmentTag;
     private Bundle args;
@@ -119,7 +118,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             fragmentTag = savedInstanceState.getString("fragmentTag");
             mViewers = savedInstanceState.getParcelableArrayList("mViewers");
             editing = savedInstanceState.getBoolean("editing");
-            adding = savedInstanceState.getBoolean("adding");
             savedName = savedInstanceState.getString("savedName");
             savedEmail = savedInstanceState.getString("savedEmail");
         }
@@ -148,12 +146,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
             }
         }
 
-        if (args.containsKey("adding")) {
-            if (args.getBoolean("adding")) {
-                adding = true;
-            }
-        }
-
         if (args.containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
@@ -164,6 +156,10 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
 
         if (args.containsKey("fragmentTag")) {
             fragmentTag = args.getString("fragmentTag");
+        }
+
+        if (args.containsKey("nViewers")) {
+            nViewers = args.getInt("nViewers");
         }
 
         // Validator
@@ -231,15 +227,14 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         args.putString("fragmentTag", fragmentTag);
         args.putInt("nViewers", nViewers);
-        if (editing || adding) {
-            Log.v("ViewerInfo", "editing or adding");
+        if (editing) {
+            Log.v("ViewerInfo", "editing");
             final Fragment editViewerInfo = new EditViewersFragment();
             editViewerInfo.setArguments(args);
             final FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.container, editViewerInfo);
             ft.commit();
             editing = false;
-            adding = false;
         } else if (mViewers.size() == nViewers) {
             getViewerInfo(mViewers, true);
         } else {
@@ -291,7 +286,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         outState.putString("savedName", mNameEditText.getText().toString());
         outState.putString("savedEmail", mEmailEditText.getText().toString());
         outState.putBoolean("editing", editing);
-        outState.putBoolean("adding", adding);
         outState.putInt("nViewers", nViewers);
     }
 
@@ -328,7 +322,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
                         args.putString("savedName", mNameEditText.getText().toString());
                         args.putString("savedEmail", mEmailEditText.getText().toString());
                         args.putBoolean("editing", editing);
-                        args.putBoolean("adding", adding);
                         args.putInt("nViewers", nViewers);
                         ViewHelper.startAdminFragment(getContext(), FRAGMENT_TAG, args);
                     }
