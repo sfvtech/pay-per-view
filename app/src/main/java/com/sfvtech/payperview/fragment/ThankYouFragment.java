@@ -46,6 +46,7 @@ public class ThankYouFragment extends Fragment {
 
         // Go to start activity after 10 seconds
         timer.schedule(new MyTimerTask(), 10000);
+        setRetainInstance(true);
 
         return view;
     }
@@ -55,16 +56,17 @@ public class ThankYouFragment extends Fragment {
         void onSessionFinished();
     }
 
-    // TODO this causes issues... Can we just do a restart button? Or disable admin menu in thank you fragment?
     private class MyTimerTask extends TimerTask {
         @Override
         public void run() {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mCallback.onSessionFinished();
-                }
-            });
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCallback.onSessionFinished();
+                    }
+                });
+            }
         }
     }
 

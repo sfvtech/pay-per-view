@@ -12,6 +12,7 @@ import android.view.ViewParent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,9 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.pressImeActionButton;
 import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -29,7 +32,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class ValidNumberViewersAndInfo {
+public class InvalidInputTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -54,7 +57,7 @@ public class ValidNumberViewersAndInfo {
     }
 
     @Test
-    public void fullTest() {
+    public void invalidInputTest() {
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.oneButton), withText("1"),
                         childAtPosition(
@@ -74,17 +77,17 @@ public class ValidNumberViewersAndInfo {
                                         1),
                                 0),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("Emily"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("1"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.nameEditText), withText("Emily"),
+                allOf(withId(R.id.nameEditText), withText("1"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         1),
                                 0),
                         isDisplayed()));
-        appCompatEditText2.perform(click());
+        appCompatEditText2.perform(pressImeActionButton());
 
         ViewInteraction appCompatEditText3 = onView(
                 allOf(withId(R.id.emailEditText),
@@ -94,7 +97,7 @@ public class ValidNumberViewersAndInfo {
                                         1),
                                 1),
                         isDisplayed()));
-        appCompatEditText3.perform(replaceText("email@mail.com"), closeSoftKeyboard());
+        appCompatEditText3.perform(pressImeActionButton());
 
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.okButton), withText("OK"),
@@ -105,5 +108,36 @@ public class ValidNumberViewersAndInfo {
                                 2),
                         isDisplayed()));
         appCompatButton2.perform(click());
+
+        ViewInteraction appCompatEditText4 = onView(
+                allOf(withId(R.id.nameEditText), withText("1"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        1),
+                                0),
+                        isDisplayed()));
+        appCompatEditText4.perform(pressImeActionButton());
+
+        ViewInteraction appCompatEditText5 = onView(
+                allOf(withId(R.id.emailEditText),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        1),
+                                1),
+                        isDisplayed()));
+        appCompatEditText5.perform(pressImeActionButton());
+
+        ViewInteraction editText = onView(
+                allOf(withId(R.id.nameEditText), withText("1"),
+                        childAtPosition(
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        1),
+                                0),
+                        isDisplayed()));
+        editText.check(matches(isDisplayed()));
+
     }
 }
