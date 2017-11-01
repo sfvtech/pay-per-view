@@ -105,10 +105,11 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
             editViewersButton.setVisibility(View.GONE);
         }
 
+        // TODO make this dynamic to different MAX_VIEWER numbers
         LinearLayout changeViewerNumber = v.findViewById(R.id.change_viewer_number);
         if (fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) && nViewers != MAX_VIEWERS) {
             changeViewerNumber.setVisibility(View.VISIBLE);
-            if (nViewers == 1) {
+            if (nViewers < MAX_VIEWERS) {
                 Button button2 = v.findViewById(R.id.adminChangeViewerNumber2);
                 Button button3 = v.findViewById(R.id.adminChangeViewerNumber3);
                 button2.setOnClickListener(this);

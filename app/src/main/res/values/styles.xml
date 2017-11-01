@@ -59,8 +59,10 @@
     <style name="AdminButton">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
         <item name="android:layout_margin">10dp</item>
-        <item name="android:textSize">48sp</item>
+        <item name="android:padding">20dp</item>
+        <item name="android:textSize">36sp</item>
     </style>
 
     <style name="TableCell">
