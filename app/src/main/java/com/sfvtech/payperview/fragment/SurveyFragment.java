@@ -1,10 +1,8 @@
 package com.sfvtech.payperview.fragment;
 
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -25,7 +23,6 @@ import com.mobsandgeeks.saripaar.annotation.Required;
 import com.sfvtech.payperview.R;
 import com.sfvtech.payperview.ViewHelper;
 import com.sfvtech.payperview.Viewer;
-import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
 
 import java.util.ArrayList;
@@ -272,48 +269,17 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
 
     // @todo move this into the Session model
     private void saveSession(long sessionId) {
-
         // Finalize the session session
         // @todo move getWritableDatabase() into AsyncTask
-        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
-        // End time values
-        ContentValues values = new ContentValues();
-        values.put(DatabaseContract.SessionEntry.COLUMN_END_TIME, new Date().toString());
-        // Selection criteria
-        String selection = DatabaseContract.SessionEntry._ID + " = ?";
-        String[] selectionArgs = {String.valueOf(sessionId)};
-
-        int count = database.update(
-                DatabaseContract.SessionEntry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs
-        );
-        Log.d(FRAGMENT_TAG, "Just updated " + Integer.toString(count) + " session row, id is " + Long.toString(sessionId));
-        database.close();
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        dbHelper.saveSession(sessionId);
     }
 
-    // @todo move into Viewer model
     private void saveCurrentViewer() {
         // Save the current viewer to the db
         // @todo move getWritableDatabase() into AsyncTask
-        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(DatabaseContract.ViewerEntry.COLUMN_NAME, mCurrentViewer.getName());
-        values.put(DatabaseContract.ViewerEntry.COLUMN_EMAIL, mCurrentViewer.getEmail());
-        values.put(DatabaseContract.ViewerEntry.COLUMN_SESSION_ID, mCurrentViewer.getSessionId());
-        values.put(DatabaseContract.ViewerEntry.COLUMN_SURVEY_ANSWER, mCurrentViewer.getSurveyAnswer());
-
-        long newRowId;
-        newRowId = database.insert(
-                DatabaseContract.ViewerEntry.TABLE_NAME,
-                DatabaseContract.ViewerEntry.COLUMN_NULLABLE,
-                values
-        );
-
-        database.close();
-        Log.d(FRAGMENT_TAG, "Just inserted user id " + Long.toString(newRowId));
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        dbHelper.saveViewer(mCurrentViewer);
     }
 
     public void deselectAllButtons() {
