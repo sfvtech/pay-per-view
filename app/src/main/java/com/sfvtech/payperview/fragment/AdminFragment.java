@@ -35,8 +35,8 @@ import java.util.ArrayList;
  */
 public class AdminFragment extends Fragment implements View.OnClickListener {
 
-    public static final String EXTRA_INSTALLATION_ID = ViewerSurvey.PACKAGE + "EXTRA_INSTALLATION_ID";
     public static final String FRAGMENT_TAG = "AdminFragment";
+    public final static String EXTRA_INSTALLATION_ID = "EXTRA_INSTALLATION_ID";
     final String installationId = MainActivity.ID;
     private Button cancelButton;
     private Button restartButton;
