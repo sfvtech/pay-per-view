@@ -47,7 +47,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
     private LinearLayout surveyLayout;
     private TextView mSurveyTitle;
     private String surveyChoice = "";
-    private Button okButton;
     private Button surveyOption1;
     private Button surveyOption2;
     private Button surveyOption3;
@@ -103,8 +102,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
 
         surveyLayout = (LinearLayout) v.findViewById(R.id.survey_options);
         mSurveyTitle = (TextView) v.findViewById(R.id.survey_title);
-        okButton = (Button) v.findViewById(R.id.okButton);
-        okButton.setOnClickListener(this);
         surveyOption1 = (Button) v.findViewById(R.id.survey_option_one);
         surveyOption1.setOnClickListener(this);
         surveyOption2 = (Button) v.findViewById(R.id.survey_option_two);
@@ -142,7 +139,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         emailTextView.setVisibility(View.GONE);
         mSurveyTitle.setVisibility(View.VISIBLE);
         surveyLayout.setVisibility(View.VISIBLE);
-        okButton.setVisibility(View.VISIBLE);
     }
 
     private void middleSurvey() {
@@ -151,13 +147,12 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         emailTextView.setVisibility(View.GONE);
         mSurveyTitle.setVisibility(View.VISIBLE);
         surveyLayout.setVisibility(View.VISIBLE);
-        okButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onValidationFailed(View failedView, Rule<?> failedRule) {
         // Reset the OK button's appearance
-        emailConfirmButton.setBackgroundResource(R.drawable.button_sm_deselected);
+        //emailConfirmButton.setBackgroundResource(R.drawable.button_sm_deselected);
         if (failedView instanceof EditText) {
             ((EditText) failedView).setError(failedRule.getFailureMessage());
             failedView.requestFocus();
@@ -183,57 +178,31 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         emailTextView.setText(mCurrentViewer.getEmail());
         emailQuestion.setText(String.format(res.getString(R.string.correct_email_confirmation), mCurrentViewer.getName()));
         mSurveyTitle.setText(String.format(res.getString(R.string.survey_question), mCurrentViewer.getName()));
-
-        deselectAllButtons();
     }
 
     @Override
     public void onClick(View view) {
-        deselectAllButtons();
-        view.setBackgroundResource(R.drawable.button_med_selected);
         // Check which radio button was clicked
         switch (view.getId()) {
             case R.id.survey_option_one:
                 surveyChoice = getString(R.string.survey_option_one_value);
+                surveyAnswered();
                 break;
             case R.id.survey_option_two:
                 surveyChoice = getString(R.string.survey_option_two_value);
+                surveyAnswered();
                 break;
             case R.id.survey_option_three:
                 surveyChoice = getString(R.string.survey_option_three_value);
+                surveyAnswered();
                 break;
             case R.id.survey_option_four:
                 surveyChoice = getString(R.string.survey_option_four_value);
+                surveyAnswered();
                 break;
             case R.id.survey_option_five:
                 surveyChoice = getString(R.string.survey_option_five_value);
-                break;
-            case R.id.okButton:
-                view.setBackgroundResource(R.drawable.button_sm_selected);
-
-                // Make sure the current viewer has submitted an answer
-                if (TextUtils.isEmpty(surveyChoice)) {
-                    view.setBackgroundResource(R.drawable.button_sm_deselected);
-                    return;
-                }
-                mCurrentViewer.setSurveyAnswer(surveyChoice);
-                saveCurrentViewer();
-                mViewersIterator.remove();
-
-                if (mViewersIterator.hasNext()) {
-                    incrementViewer();
-                    surveyChoice = "";
-                    emailConfirmButton.setVisibility(View.VISIBLE);
-                    emailQuestion.setVisibility(View.VISIBLE);
-                    emailTextView.setVisibility(View.VISIBLE);
-                    mSurveyTitle.setVisibility(View.GONE);
-                    surveyLayout.setVisibility(View.GONE);
-                    okButton.setVisibility(View.GONE);
-                } else {
-                    // Get the session id from the current viewer
-                    saveSession(mCurrentViewer.getSessionId());
-                    mCallback.onSurveyFinished();
-                }
+                surveyAnswered();
                 break;
             case R.id.email_confirm_button:
                 mValidator.validate();
@@ -267,6 +236,30 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         }
     }
 
+    private void surveyAnswered() {
+        if (TextUtils.isEmpty(surveyChoice)) {
+            //view.setBackgroundResource(R.drawable.button_sm_deselected);
+            return;
+        }
+        mCurrentViewer.setSurveyAnswer(surveyChoice);
+        saveCurrentViewer();
+        mViewersIterator.remove();
+
+        if (mViewersIterator.hasNext()) {
+            incrementViewer();
+            surveyChoice = "";
+            emailConfirmButton.setVisibility(View.VISIBLE);
+            emailQuestion.setVisibility(View.VISIBLE);
+            emailTextView.setVisibility(View.VISIBLE);
+            mSurveyTitle.setVisibility(View.GONE);
+            surveyLayout.setVisibility(View.GONE);
+        } else {
+            // Get the session id from the current viewer
+            saveSession(mCurrentViewer.getSessionId());
+            mCallback.onSurveyFinished();
+        }
+    }
+
     // @todo move this into the Session model
     private void saveSession(long sessionId) {
         // Finalize the session session
@@ -280,19 +273,6 @@ public class SurveyFragment extends Fragment implements View.OnClickListener, Va
         // @todo move getWritableDatabase() into AsyncTask
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         dbHelper.saveViewer(mCurrentViewer);
-    }
-
-    public void deselectAllButtons() {
-
-        ViewGroup options = (ViewGroup) mLayout.findViewById(R.id.survey_options);
-        for (int i = 0, ii = options.getChildCount(); i < ii; i++) {
-            View v = options.getChildAt(i);
-            if (v instanceof Button) {
-                v.setBackgroundResource(R.drawable.button_med_deselected);
-            }
-        }
-        okButton.setBackgroundResource(R.drawable.button_sm_deselected);
-        emailConfirmButton.setBackgroundResource(R.drawable.button_sm_deselected);
     }
 
     @Override

@@ -84,7 +84,6 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        view.setBackgroundResource(R.drawable.button_lg_selected);
         switch (view.getId()) {
             case R.id.oneButton:
                 getViewerInfo(1);

@@ -90,6 +90,10 @@
     <string name="fragmentTag">fragmentTag</string>
     <string name="open_preferences">Open Preferences</string>
     <string name="edit_viewers">Edit Viewers</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_3">3</string>
+    <string name="example_email">email@email.com</string>
 
 
 </resources>

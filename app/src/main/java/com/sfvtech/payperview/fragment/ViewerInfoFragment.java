@@ -171,7 +171,6 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                view.setBackgroundResource(R.drawable.button_sm_selected);
                 mValidator.validate();
             }
         });
@@ -240,14 +239,11 @@ public class ViewerInfoFragment extends Fragment implements Validator.Validation
         } else {
             getViewerInfo(mViewers, false);
             clearForm();
-            okButton.setBackgroundResource(R.drawable.button_sm_deselected);
         }
     }
 
     @Override
     public void onValidationFailed(View failedView, Rule<?> failedRule) {
-        // Reset the OK button's appearance
-        okButton.setBackgroundResource(R.drawable.button_sm_deselected);
         if (failedView instanceof EditText) {
             ((EditText) failedView).setError(failedRule.getFailureMessage());
             failedView.requestFocus();

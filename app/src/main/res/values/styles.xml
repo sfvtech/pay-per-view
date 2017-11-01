@@ -4,13 +4,14 @@
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:fontFamily">"sans-serif-condensed"</item>
     </style>
 
     <style name="TitleText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">8dp</item>
-        <item name="android:textSize">62sp</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:textSize">72sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -21,15 +22,17 @@
         <item name="android:layout_margin">20dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/button_lg_deselected</item>
+        <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
     </style>
 
     <style name="LanguageSelector">
-        <item name="android:textSize">25sp</item>
+        <item name="android:textSize">48sp</item>
         <item name="android:layout_margin">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">20dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/button_lg_deselected</item>
+        <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
     </style>
 
     <style name="SurveyOption">
@@ -37,19 +40,20 @@
         <item name="android:textStyle">bold</item>
         <item name="android:padding">30dp</item>
         <item name="android:layout_margin">20dp</item>
-        <item name="android:layout_width">180dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/button_med_deselected</item>
+        <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
     </style>
 
     <style name="okButton">
         <item name="android:layout_margin">20dp</item>
-        <item name="android:layout_width">125dp</item>
-        <item name="android:layout_height">125dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">48sp</item>
+        <item name="android:padding">20dp</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:background">@drawable/button_sm_deselected</item>
+        <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
     </style>
 
     <style name="AdminButton">

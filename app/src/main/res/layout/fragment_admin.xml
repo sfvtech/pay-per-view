@@ -11,11 +11,6 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/title_activity_admin" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
         <Button
             android:id="@+id/adminRestartButton"
             style="@style/AdminButton"
@@ -33,7 +28,6 @@
             android:layout_gravity="center_horizontal"
             android:onClick="handleUpload"
             android:text="@string/admin_upload_button" />
-    </LinearLayout>
 
     <Button
         android:id="@+id/adminCancelButton"
@@ -44,16 +38,6 @@
         android:layout_margin="0dp"
         android:onClick="handleCancel"
         android:text="@string/admin_cancel_button" />
-
-    <Button
-        android:id="@+id/adminOpenPreferences"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="0dp"
-        android:onClick="handleCancel"
-        android:text="@string/open_preferences" />
 
     <Button
         android:id="@+id/adminEditViewers"
@@ -100,7 +84,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -166,7 +150,7 @@
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="16dp"
         android:orientation="vertical"
         android:paddingBottom="5dp"
         android:stretchColumns="1">
