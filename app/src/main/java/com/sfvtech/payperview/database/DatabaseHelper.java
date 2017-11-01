@@ -110,7 +110,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " = " + "V." + DatabaseContract.ViewerEntry.COLUMN_SESSION_ID +
                 " WHERE " + "V." + DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME + " IS NULL;";
 
-        // Auto closeable cursor try-with-resources
         Cursor cursor = null;
         try {
             cursor = database.rawQuery(selectQuery, null);

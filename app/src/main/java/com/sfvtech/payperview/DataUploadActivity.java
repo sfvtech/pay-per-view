@@ -233,7 +233,6 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
      * Updates the "number of records to update" counter
      */
     protected void updateRecordsToUploadView() {
-
         TextView recordsToUploadView = (TextView) findViewById(R.id.records_to_upload_value);
         mRecordsToUpload = getNewRecordCount();
         recordsToUploadView.setText(Long.toString(mRecordsToUpload));
@@ -255,6 +254,23 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
             return info.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             return 0;
+        }
+    }
+
+    private class updateRecordsTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
         }
     }
 
