@@ -207,14 +207,10 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
     /**
      * Sets the "uploaded time" for uploaded files, in bulk.
-     *
-     * @return Boolean
-     * @todo move getWritableDatabase() into AsyncTask
      */
-    private boolean updateNewRecords() {
+    private void updateNewRecords() {
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        databaseHelper.updateNewRecords();
-        return true;
+        new updateRecordsTask().execute(databaseHelper);
     }
 
     /**
@@ -257,20 +253,11 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private class updateRecordsTask extends AsyncTask<String, Void, Boolean> {
+    private class updateRecordsTask extends AsyncTask<DatabaseHelper, Void, Boolean> {
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected Boolean doInBackground(DatabaseHelper... databaseHelpers) {
+            databaseHelpers[0].updateNewRecords();
+            return true;
         }
     }
 
