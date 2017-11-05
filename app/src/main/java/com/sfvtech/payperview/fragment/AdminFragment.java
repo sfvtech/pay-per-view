@@ -18,13 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sfvtech.payperview.DataUploadActivity;
+import com.sfvtech.payperview.MainActivity;
 import com.sfvtech.payperview.R;
 import com.sfvtech.payperview.Viewer;
-import com.sfvtech.payperview.ViewerSurvey;
 import com.sfvtech.payperview.utils.DownloadUtils;
 
 import java.util.ArrayList;
@@ -34,10 +35,9 @@ import java.util.ArrayList;
  */
 public class AdminFragment extends Fragment implements View.OnClickListener {
 
-    public static final String EXTRA_INSTALLATION_ID = ViewerSurvey.PACKAGE + "EXTRA_INSTALLATION_ID";
     public static final String FRAGMENT_TAG = "AdminFragment";
-
-    private String mInstallationId;
+    public final static String EXTRA_INSTALLATION_ID = "EXTRA_INSTALLATION_ID";
+    final String installationId = MainActivity.ID;
     private Button cancelButton;
     private Button restartButton;
     private Button uploadButton;
@@ -64,10 +64,6 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         final View v = inflater.inflate(R.layout.fragment_admin, container, false);
 
-        // Set up metadata display
-        if (getArguments().containsKey("ID")) {
-            mInstallationId = getArguments().getString("ID");
-        }
         if (getArguments().containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
@@ -82,7 +78,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         }
 
         final TextView installationIdView = (TextView) v.findViewById(R.id.installationIdValue);
-        installationIdView.setText(mInstallationId);
+        installationIdView.setText(installationId);
 
         cancelButton = (Button) v.findViewById(R.id.adminCancelButton);
         cancelButton.setOnClickListener(this);
@@ -105,8 +101,23 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         editViewersButton = (Button) v.findViewById(R.id.adminEditViewers);
         editViewersButton.setOnClickListener(this);
 
-        if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG)) {
+        if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG) || fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) || fragmentTag.equals(VideoFragment.FRAGMENT_TAG)) {
             editViewersButton.setVisibility(View.GONE);
+        }
+
+        // TODO make this dynamic to different MAX_VIEWER numbers
+        LinearLayout changeViewerNumber = v.findViewById(R.id.change_viewer_number);
+        if (fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) && nViewers != MAX_VIEWERS) {
+            changeViewerNumber.setVisibility(View.VISIBLE);
+            if (nViewers < MAX_VIEWERS) {
+                Button button2 = v.findViewById(R.id.adminChangeViewerNumber2);
+                Button button3 = v.findViewById(R.id.adminChangeViewerNumber3);
+                button2.setOnClickListener(this);
+                button3.setOnClickListener(this);
+                if (nViewers == 2) {
+                    button2.setVisibility(View.GONE);
+                }
+            }
         }
 
         final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
@@ -154,13 +165,21 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                         beginTransaction().replace(R.id.container, editViewersFragment, EditViewersFragment.FRAGMENT_TAG).
                         commit();
                 break;
+            case R.id.adminChangeViewerNumber2:
+                nViewers = 2;
+                handleCancel();
+                break;
+            case R.id.adminChangeViewerNumber3:
+                nViewers = 3;
+                handleCancel();
+                break;
 
         }
     }
 
     public void handleUpload() {
         final Intent intent = new Intent(getActivity(), DataUploadActivity.class);
-        intent.putExtra(EXTRA_INSTALLATION_ID, mInstallationId);
+        intent.putExtra(EXTRA_INSTALLATION_ID, installationId);
         startActivity(intent);
     }
 
@@ -170,6 +189,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         args.putParcelableArrayList("mViewers", mViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
         args.putInt("nViewers", nViewers);
+        Log.v("AdminFragment:FragTag", fragmentTag);
         switch (fragmentTag) {
             case ViewerNumberFragment.FRAGMENT_TAG:
                 final Fragment viewerNumberFragment = new ViewerNumberFragment();
@@ -203,11 +223,13 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 break;
             case ThankYouFragment.FRAGMENT_TAG:
             default:
+                // we don't know where we came from... so restart
                 restart();
         }
     }
 
     private void restart() {
+        Log.v(AdminFragment.FRAGMENT_TAG, "Restart Called");
         final Fragment viewerNumberFragment = new ViewerNumberFragment();
         final Bundle restartArgs = new Bundle();
         restartArgs.putParcelableArrayList("mViewers", new ArrayList<Viewer>());

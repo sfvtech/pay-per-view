@@ -68,6 +68,11 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (savedInstanceState != null) {
+            mViewers = savedInstanceState.getParcelableArrayList("mViewers");
+            MAX_VIEWERS = savedInstanceState.getInt("MAX_VIEWERS");
+        }
+
         if (getArguments().containsKey("mViewers")) {
             mViewers = getArguments().getParcelableArrayList("mViewers");
         }
@@ -77,6 +82,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
         }
         if (getArguments().containsKey("fragmentTag")) {
             fragmentTag = getArguments().getString("fragmentTag");
+            Log.v("EditViewer", fragmentTag);
         }
 
         Log.v("MAX ON CREATE", MAX_VIEWERS + "");
@@ -86,7 +92,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
 
         // Inflate list of viewers
         listView = v.findViewById(R.id.list);
-        myAdapter = new ViewerAdapter(getContext(), mViewers, MAX_VIEWERS);
+        myAdapter = new ViewerAdapter(getContext(), mViewers, MAX_VIEWERS, fragmentTag);
         listView.setAdapter(myAdapter);
 
         confirmButton = (Button) v.findViewById(R.id.confirm);
@@ -114,6 +120,8 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 case SurveyFragment.FRAGMENT_TAG:
                     addNewButton.setVisibility(View.GONE);
                     break;
+                default:
+                    break;
             }
         }
         return v;
@@ -128,7 +136,6 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 args.putParcelableArrayList("mViewers", mViewers);
                 args.putInt("MAX_VIEWERS", MAX_VIEWERS);
                 args.putString("fragmentTag", fragmentTag);
-                args.putBoolean("adding", true);
                 viewerInfoFragment.setArguments(args);
                 ((AppCompatActivity) getContext()).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).
@@ -136,6 +143,7 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
                 break;
             case R.id.confirm:
                 mCallback.onEditViewersFinished(mViewers, fragmentTag);
+                Log.v("mViewers string edit", mViewers.toString());
                 break;
             case R.id.restartButton:
                 final Fragment viewerNumberFragment = new ViewerNumberFragment();
@@ -160,6 +168,13 @@ public class EditViewersFragment extends Fragment implements View.OnClickListene
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("mViewers", mViewers);
+        outState.putInt("MAX_VIEWERS", MAX_VIEWERS);
     }
 
     // Container Activity must implement this interface

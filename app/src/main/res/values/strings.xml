@@ -12,7 +12,7 @@
     <!-- ViewerNumberActivity -->
     <string name="viewer_number_question">How many viewers are here?</string>
     <string name="language_selector_label">Español</string>
-    <string name="language_selector_value">es_US</string>
+    <string name="language_selector_value">es</string>
 
     <!-- ViewerInfoActivity -->
     <string name="viewer_info_salutation">Viewer</string>
@@ -85,6 +85,15 @@
 
     <string name="correct_email_confirmation">%1$s, is this your correct email?</string>
     <string name="back_to_admin">Back to admin</string>
+    <string name="yes">Yes</string>
+
+    <string name="fragmentTag">fragmentTag</string>
+    <string name="open_preferences">Open Preferences</string>
+    <string name="edit_viewers">Edit Viewers</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_3">3</string>
+    <string name="example_email">email@email.com</string>
 
 
 </resources>

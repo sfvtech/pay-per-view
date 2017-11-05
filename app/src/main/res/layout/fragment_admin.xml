@@ -6,38 +6,39 @@
     <TextView
         android:id="@+id/admin_title"
         style="@style/TitleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/title_activity_admin" />
 
-    <Button
-        android:id="@+id/adminRestartButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="handleRestart"
-        android:text="@string/admin_restart_button" />
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/adminUploadButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="handleUpload"
-        android:text="@string/admin_upload_button" />
+        <Button
+            android:id="@+id/adminRestartButton"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handleRestart"
+            android:text="@string/admin_restart_button" />
 
-    <Button
-        android:id="@+id/adminCancelButton"
-        style="@style/AdminButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="30dp"
-        android:onClick="handleCancel"
-        android:text="@string/admin_cancel_button" />
+        <Button
+            android:id="@+id/adminUploadButton"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handleUpload"
+            android:text="@string/admin_upload_button" />
+
+        <Button
+            android:id="@+id/adminCancelButton"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="handleCancel"
+            android:text="@string/admin_cancel_button" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/adminEditViewers"
@@ -45,13 +46,47 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="30dp"
-        android:text="Edit Viewers" />
+        android:text="@string/edit_viewers" />
+
+    <LinearLayout
+        android:id="@+id/change_viewer_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Change Viewer Number"
+            android:textSize="36sp" />
+
+        <Button
+            android:id="@+id/adminChangeViewerNumber2"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="2" />
+
+        <Button
+            android:id="@+id/adminChangeViewerNumber3"
+            style="@style/AdminButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="3" />
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="40dp"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -117,7 +152,7 @@
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
+        android:layout_margin="16dp"
         android:orientation="vertical"
         android:paddingBottom="5dp"
         android:stretchColumns="1">

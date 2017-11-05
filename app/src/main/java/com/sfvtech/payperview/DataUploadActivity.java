@@ -2,12 +2,10 @@ package com.sfvtech.payperview;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -203,84 +201,16 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
      * @todo put in an AsyncTask
      */
     private String getNewRecordsAsCsv() {
-
-        StringBuilder csv = new StringBuilder();
-
-        SQLiteDatabase database = new DatabaseHelper(this).getReadableDatabase();
-        String selectQuery = "SELECT " +
-                "S." + DatabaseContract.SessionEntry._ID + ", " +
-                "V." + DatabaseContract.ViewerEntry.COLUMN_SESSION_ID + ", " +
-                "V." + DatabaseContract.ViewerEntry.COLUMN_NAME + ", " +
-                "V." + DatabaseContract.ViewerEntry.COLUMN_EMAIL + ", " +
-                "V." + DatabaseContract.ViewerEntry.COLUMN_SURVEY_ANSWER + ", " +
-                "S." + DatabaseContract.SessionEntry.COLUMN_START_TIME + ", " +
-                "S." + DatabaseContract.SessionEntry.COLUMN_END_TIME + ", " +
-                "S." + DatabaseContract.SessionEntry.COLUMN_LAT + ", " +
-                "S." + DatabaseContract.SessionEntry.COLUMN_LONG + ", " +
-                "S." + DatabaseContract.SessionEntry.COLUMN_LOCALE +
-                " FROM " + DatabaseContract.ViewerEntry.TABLE_NAME + " V" +
-                " JOIN " + DatabaseContract.SessionEntry.TABLE_NAME + " S" +
-                " ON " + "S." + DatabaseContract.SessionEntry._ID +
-                " = " + "V." + DatabaseContract.ViewerEntry.COLUMN_SESSION_ID +
-                " WHERE " + "V." + DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME + " IS NULL;";
-
-        // Auto closeable cursor try-with-resources
-        Cursor cursor = null;
-        try {
-            cursor = database.rawQuery(selectQuery, null);
-            // looping through all rows and adding string
-            if (cursor.moveToFirst()) {
-                do {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(cursor.getString(0)).append(","); // viewer id
-                    stringBuilder.append(cursor.getString(1)).append(","); // session id
-                    stringBuilder.append(cursor.getString(2)).append(","); // viewer name
-                    stringBuilder.append(cursor.getString(3)).append(","); // viewer email
-                    stringBuilder.append(cursor.getString(4)).append(","); // viewer pledge
-                    stringBuilder.append("\"").append(cursor.getString(5)).append("\","); // session start time
-                    stringBuilder.append("\"").append(cursor.getString(6)).append("\","); // session end time
-                    stringBuilder.append(cursor.getDouble(7)).append(","); // session latitude
-                    stringBuilder.append(cursor.getDouble(8)).append(","); // session longitude
-                    stringBuilder.append(cursor.getString(9)); // session locale
-                    csv.append(stringBuilder).append("\n");
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        database.close();
-        return csv.toString();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        return dbHelper.getRecordsAsCSV();
     }
 
     /**
      * Sets the "uploaded time" for uploaded files, in bulk.
-     *
-     * @return Boolean
-     * @todo move getWritableDatabase() into AsyncTask
      */
-    private boolean updateNewRecords() {
-        SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
-
-        // Upload time values
-        ContentValues values = new ContentValues();
-        values.put(DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME, new Date().toString());
-
-        // Selection criteria
-        String selection = DatabaseContract.ViewerEntry.COLUMN_UPLOADED_TIME + " IS NULL";
-
-        int count = database.update(
-                DatabaseContract.ViewerEntry.TABLE_NAME,
-                values,
-                selection,
-                null
-        );
-        Log.d(LOG_TAG, "Just updated " + Integer.toString(count) + " viewer record upload dates.");
-        database.close();
-        return true;
+    private void updateNewRecords() {
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        new updateRecordsTask().execute(databaseHelper);
     }
 
     /**
@@ -299,7 +229,6 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
      * Updates the "number of records to update" counter
      */
     protected void updateRecordsToUploadView() {
-
         TextView recordsToUploadView = (TextView) findViewById(R.id.records_to_upload_value);
         mRecordsToUpload = getNewRecordCount();
         recordsToUploadView.setText(Long.toString(mRecordsToUpload));
@@ -324,13 +253,20 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         }
     }
 
+    private class updateRecordsTask extends AsyncTask<DatabaseHelper, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(DatabaseHelper... databaseHelpers) {
+            databaseHelpers[0].updateNewRecords();
+            return true;
+        }
+    }
+
     private class CheckServerStatus extends AsyncTask<String, Void, Boolean> {
 
         @Override
         // @todo require https URLs by default, but allow for configurable (insecure) override
         protected Boolean doInBackground(String... params) {
             try {
-                // @todo refactor to use HttpURLConnection instead. HttpClient is @deprecated
                 URL urlObj = new URL(params[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) urlObj.openConnection();
                 urlConnection.setReadTimeout(10000); // 10 seconds

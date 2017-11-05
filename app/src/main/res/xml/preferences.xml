@@ -16,4 +16,17 @@
         android:defaultValue=""
         android:key="localURIForSubtitles"
         android:title="Local URI for Subtitles" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="secret_key"
+        android:title="Server Secret Key" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="secret_value"
+        android:title="Server Secret Value" />
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="upload_endpoint_url"
+        android:title="Upload Endpoint URL" />
+
 </PreferenceScreen>

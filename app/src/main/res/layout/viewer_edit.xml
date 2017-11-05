@@ -29,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@android:drawable/dialog_holo_dark_frame"
         android:padding="16dp"
         android:text="Edit"
         android:textSize="32sp" />
@@ -38,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@android:drawable/dialog_holo_dark_frame"
         android:padding="16dp"
         android:text="Delete"
         android:textSize="32sp" />

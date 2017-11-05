@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.RelativeLayout;
 
 import com.sfvtech.payperview.database.DatabaseHelper;
 import com.sfvtech.payperview.fragment.EditViewersFragment;
@@ -40,16 +39,17 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         SurveyFragment.OnSurveyFinishedListener, ThankYouFragment.OnSessionFinishedListener,
         EditViewersFragment.onEditViewersFinishedListener {
 
-    //public static final String EXTRA_VIEWERS = ViewerSurvey.PACKAGE + ":EXTRA_VIEWERS";
     public static final String LOG_TAG = "MainActivity";
     public static final int MY_PERMISSION_REQUEST_LOCATION = 100;
     public static String ID;
     public static double longitude;
     public static double latitude;
+
     // Attributes
     public int MAX_VIEWERS = 0;
-    public int mNViewers = 0;
-    public ArrayList<Viewer> mViewers;
+    public int nViewers = 0;
+    public ArrayList<Viewer> mViewers = new ArrayList<>();
+
     /**
      * Attachment download complete receiver.
      * 1. Receiver gets called once attachment download completed.
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                         final String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uriString);
                         Log.v("Tag: uriString", uriString);
                         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
-                        // final String fileName = URLUtil.guessFileName(Uri.decode(localUri), null, mimeType);
+                        //final String fileName = URLUtil.guessFileName(Uri.decode(localUri), null, mimeType);
                         //final Uri uriForFile = FileProvider.getUriForFile(context, "com.sfvtech.payperview" + FILE_PROVIDER_EXTENSION, file);
                         int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
                         Log.v("Tag: downloadstatus", "" + downloadStatus);
@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             }
         }
     };
-    private RelativeLayout mainRoot;
+
+    private String currentFragmentTag;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -127,20 +128,80 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         } else {
             ID = id;
         }
-        Log.v("TAG", ID);
+        Log.v("MainActivity:ID", ID);
 
         getLocation();
 
-        final Fragment viewerNumberFragment = new ViewerNumberFragment();
+        if (savedInstanceState == null) {
+            Log.v("Main:savedInstance", "is null");
+            currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
+        } else {
+            Log.v("SavedInstance", "not null");
+            currentFragmentTag = savedInstanceState.getString("currentFragmentTag");
+            Log.v("Main:currentFrag", currentFragmentTag);
+            MAX_VIEWERS = savedInstanceState.getInt("MAX_VIEWERS");
+            nViewers = savedInstanceState.getInt("nViewers");
+            mViewers = savedInstanceState.getParcelableArrayList("mViewers");
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.v("Main:OnStart", currentFragmentTag);
+        final Bundle args = new Bundle();
+        args.putParcelableArrayList("mViewers", mViewers);
+        args.putInt("nViewers", nViewers);
+        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        args.putString("fragmentTag", currentFragmentTag);
+        args.putString("ID", ID);
+
+        // Go to correct fragment
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.container, viewerNumberFragment);
-        ft.commit();
 
-        // Add our magic buttons to the main activity layout
-        mainRoot = (RelativeLayout) findViewById(R.id.main_root);
-        final Bundle adminArgs = new Bundle();
-        ViewHelper.addMagicMenuButtons(mainRoot, ViewerNumberFragment.FRAGMENT_TAG, adminArgs);
+        // Start fragment
+        if (!TextUtils.isEmpty(currentFragmentTag)) {
+            Log.v("EditViewerFin:FragTag", currentFragmentTag);
+            switch (currentFragmentTag) {
+                case SurveyFragment.FRAGMENT_TAG:
+                    final Fragment surveyFragment = new SurveyFragment();
+                    surveyFragment.setArguments(args);
+                    ft.replace(R.id.container, surveyFragment);
+                    ft.commit();
+                    break;
+                case ViewerInfoFragment.FRAGMENT_TAG:
+                    final Fragment viewerInfoFragment = new ViewerInfoFragment();
+                    viewerInfoFragment.setArguments(args);
+                    ft.replace(R.id.container, viewerInfoFragment);
+                    ft.commit();
+                    break;
+                case ViewerNumberFragment.FRAGMENT_TAG:
+                    final Fragment viewerNumberFragment = new ViewerNumberFragment();
+                    ft.replace(R.id.container, viewerNumberFragment);
+                    ft.commit();
+                    break;
+                case VideoFragment.FRAGMENT_TAG:
+                    final Fragment videoFragment = new VideoFragment();
+                    ft.replace(R.id.container, videoFragment);
+                    ft.commit();
+                    break;
+                default:
+                    // If we don't know where it came from, restart
+                    onSessionFinished();
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.v("MainOnSave", "onsaveinstancestate");
+        outState.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        outState.putInt("nViewers", nViewers);
+        outState.putParcelableArrayList("mViewers", mViewers);
+        outState.putString("currentFragmentTag", currentFragmentTag);
     }
 
     @Override
@@ -158,17 +219,21 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
 
     @Override
     public void onViewerNumberSelected(int nViewers) {
-        mNViewers = nViewers;
+        this.nViewers = nViewers;
         final Fragment viewerInfoFragment = new ViewerInfoFragment();
         final Bundle args = new Bundle();
+        currentFragmentTag = ViewerInfoFragment.FRAGMENT_TAG;
+        args.putParcelableArrayList("mViewers", mViewers);
         args.putInt("nViewers", nViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        args.putString("fragmentTag", currentFragmentTag);
+        args.putString("ID", ID);
         viewerInfoFragment.setArguments(args);
+        Log.v("MainActivity:fragTag", currentFragmentTag);
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerInfoFragment);
         ft.commit();
-        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
     }
 
     @Override
@@ -176,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         this.mViewers = mViewers;
         final Bundle args = new Bundle();
         args.putParcelableArrayList("mViewers", mViewers);
+        args.putString("ID", ID);
         if (viewerInfoCompleted) {
             // Go to video
             final Fragment videoFragment = new VideoFragment();
@@ -183,9 +249,9 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             final FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.container, videoFragment);
             ft.commit();
-            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), VideoFragment.FRAGMENT_TAG, args);
+            currentFragmentTag = VideoFragment.FRAGMENT_TAG;
         } else {
-            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
+            currentFragmentTag = ViewerInfoFragment.FRAGMENT_TAG;
         }
     }
 
@@ -193,15 +259,17 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     public void onVideoFinished() {
         if (!mViewers.isEmpty()) {
             // Go to survey
+            Log.v("onVideoFinished", "mViewers not empty");
             final Fragment surveyFragment = new SurveyFragment();
             final Bundle args = new Bundle();
             args.putParcelableArrayList("mViewers", mViewers);
+            args.putString("ID", ID);
             surveyFragment.setArguments(args);
             final FragmentManager fragmentManager = getSupportFragmentManager();
             final FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.container, surveyFragment);
             ft.commit();
-            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), SurveyFragment.FRAGMENT_TAG, args);
+            currentFragmentTag = SurveyFragment.FRAGMENT_TAG;
         } else {
             mViewers.clear();
             final Fragment viewerNumberFragment = new ViewerNumberFragment();
@@ -209,53 +277,60 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             final FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.container, viewerNumberFragment);
             ft.commit();
-            final Bundle args = new Bundle();
-            ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
+            currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
         }
     }
 
     @Override
     public void onEditViewersFinished(ArrayList<Viewer> mViewers, String fragmentTag) {
+        if (!TextUtils.isEmpty(fragmentTag)) {
+            Log.v("EditViewerFinished", fragmentTag);
+        }
         // Edit list of viewers
         this.mViewers = mViewers;
+        this.nViewers = mViewers.size();
 
         // Go back to whatever we were doing...
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final Bundle args = new Bundle();
         args.putParcelableArrayList("mViewers", mViewers);
-        args.putInt("nViewers", mNViewers);
+        args.putInt("nViewers", nViewers);
         args.putInt("MAX_VIEWERS", MAX_VIEWERS);
+        args.putString("fragmentTag", fragmentTag);
+        args.putString("ID", ID);
         final FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!TextUtils.isEmpty(fragmentTag)) {
+            Log.v("EditViewerFin:FragTag", fragmentTag);
             switch (fragmentTag) {
                 case SurveyFragment.FRAGMENT_TAG:
                     final Fragment surveyFragment = new SurveyFragment();
                     surveyFragment.setArguments(args);
                     ft.replace(R.id.container, surveyFragment);
                     ft.commit();
-                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), SurveyFragment.FRAGMENT_TAG, args);
+                    currentFragmentTag = SurveyFragment.FRAGMENT_TAG;
                     break;
                 case ViewerInfoFragment.FRAGMENT_TAG:
                     final Fragment viewerInfoFragment = new ViewerInfoFragment();
                     viewerInfoFragment.setArguments(args);
                     ft.replace(R.id.container, viewerInfoFragment);
                     ft.commit();
-                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerInfoFragment.FRAGMENT_TAG, args);
+                    currentFragmentTag = ViewerInfoFragment.FRAGMENT_TAG;
                     break;
                 case ViewerNumberFragment.FRAGMENT_TAG:
                     final Fragment viewerNumberFragment = new ViewerNumberFragment();
                     ft.replace(R.id.container, viewerNumberFragment);
                     ft.commit();
-                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
+                    currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
                     break;
                 case VideoFragment.FRAGMENT_TAG:
                     final Fragment videoFragment = new VideoFragment();
                     ft.replace(R.id.container, videoFragment);
                     ft.commit();
-                    ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), VideoFragment.FRAGMENT_TAG, args);
+                    currentFragmentTag = VideoFragment.FRAGMENT_TAG;
                     break;
                 default:
                     // If we don't know where it came from, restart
+                    Log.v("Onedit", "don't know where it came from");
                     onSessionFinished();
                     break;
             }
@@ -272,24 +347,26 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, thankYouFragment);
         ft.commit();
+        currentFragmentTag = ThankYouFragment.FRAGMENT_TAG;
         final Bundle args = new Bundle();
-        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ThankYouFragment.FRAGMENT_TAG, args);
+        // Disable magic buttons for Thank You Fragment
     }
 
     @Override
     public void onSessionFinished() {
         // Restart with viewer numbers
         mViewers.clear();
-        mNViewers = 0;
+        nViewers = 0;
         final Bundle args = new Bundle();
         args.putParcelableArrayList("mViewers", mViewers);
+        args.putString("ID", ID);
         final Fragment viewerNumberFragment = new ViewerNumberFragment();
         viewerNumberFragment.setArguments(args);
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.container, viewerNumberFragment);
         ft.commit();
-        ViewHelper.updateMagicButtons(mainRoot, getApplicationContext(), ViewerNumberFragment.FRAGMENT_TAG, args);
+        currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
     }
 
     @Override
