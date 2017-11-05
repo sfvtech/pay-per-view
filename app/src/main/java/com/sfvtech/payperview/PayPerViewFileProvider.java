@@ -1,4 +1,4 @@
-package com.sfvtech.payperview.utils;
+package com.sfvtech.payperview;
 
 import android.support.v4.content.FileProvider;
 
