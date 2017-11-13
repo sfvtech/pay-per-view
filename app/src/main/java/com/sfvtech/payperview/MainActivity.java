@@ -135,6 +135,11 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
         if (savedInstanceState == null) {
             Log.v("Main:savedInstance", "is null");
             currentFragmentTag = ViewerNumberFragment.FRAGMENT_TAG;
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final FragmentTransaction ft = fragmentManager.beginTransaction();
+            final Fragment viewerNumberFragment = new ViewerNumberFragment();
+            ft.replace(R.id.container, viewerNumberFragment);
+            ft.commit();
         } else {
             Log.v("SavedInstance", "not null");
             currentFragmentTag = savedInstanceState.getString("currentFragmentTag");
@@ -142,55 +147,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             MAX_VIEWERS = savedInstanceState.getInt("MAX_VIEWERS");
             nViewers = savedInstanceState.getInt("nViewers");
             mViewers = savedInstanceState.getParcelableArrayList("mViewers");
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v("Main:OnStart", currentFragmentTag);
-        final Bundle args = new Bundle();
-        args.putParcelableArrayList("mViewers", mViewers);
-        args.putInt("nViewers", nViewers);
-        args.putInt("MAX_VIEWERS", MAX_VIEWERS);
-        args.putString("fragmentTag", currentFragmentTag);
-        args.putString("ID", ID);
-
-        // Go to correct fragment
-        final FragmentManager fragmentManager = getSupportFragmentManager();
-        final FragmentTransaction ft = fragmentManager.beginTransaction();
-
-        // Start fragment
-        if (!TextUtils.isEmpty(currentFragmentTag)) {
-            Log.v("EditViewerFin:FragTag", currentFragmentTag);
-            switch (currentFragmentTag) {
-                case SurveyFragment.FRAGMENT_TAG:
-                    final Fragment surveyFragment = new SurveyFragment();
-                    surveyFragment.setArguments(args);
-                    ft.replace(R.id.container, surveyFragment);
-                    ft.commit();
-                    break;
-                case ViewerInfoFragment.FRAGMENT_TAG:
-                    final Fragment viewerInfoFragment = new ViewerInfoFragment();
-                    viewerInfoFragment.setArguments(args);
-                    ft.replace(R.id.container, viewerInfoFragment);
-                    ft.commit();
-                    break;
-                case ViewerNumberFragment.FRAGMENT_TAG:
-                    final Fragment viewerNumberFragment = new ViewerNumberFragment();
-                    ft.replace(R.id.container, viewerNumberFragment);
-                    ft.commit();
-                    break;
-                case VideoFragment.FRAGMENT_TAG:
-                    final Fragment videoFragment = new VideoFragment();
-                    ft.replace(R.id.container, videoFragment);
-                    ft.commit();
-                    break;
-                default:
-                    // If we don't know where it came from, restart
-                    onSessionFinished();
-                    break;
-            }
         }
     }
 
