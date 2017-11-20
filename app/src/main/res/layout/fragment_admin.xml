@@ -48,6 +48,14 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/edit_viewers" />
 
+    <Button
+        android:id="@+id/openPref"
+        style="@style/AdminButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/preferences" />
+
     <LinearLayout
         android:id="@+id/change_viewer_number"
         android:layout_width="match_parent"

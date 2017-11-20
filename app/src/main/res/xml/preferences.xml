@@ -28,5 +28,9 @@
         android:defaultValue=""
         android:key="upload_endpoint_url"
         android:title="Upload Endpoint URL" />
+    <SwitchPreferenceCompat
+        android:defaultValue="true"
+        android:key="useSubtitles"
+        android:title="Use Subtitles" />
 
 </PreferenceScreen>

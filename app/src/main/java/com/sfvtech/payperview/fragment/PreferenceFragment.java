@@ -13,6 +13,7 @@ import com.sfvtech.payperview.R;
 
 public class PreferenceFragment extends PreferenceFragmentCompat {
 
+    public static final String FRAGMENT_TAG = "preference";
     private ListPreference mListPreference;
 
     @Override

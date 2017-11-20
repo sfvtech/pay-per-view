@@ -94,6 +94,7 @@
     <string name="_2">2</string>
     <string name="_3">3</string>
     <string name="example_email">email@email.com</string>
+    <string name="preferences">Preferences</string>
 
 
 </resources>

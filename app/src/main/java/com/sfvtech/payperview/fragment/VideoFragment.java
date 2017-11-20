@@ -102,13 +102,11 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //ViewHelper.addMagicMenuButtons(videoRoot, FRAGMENT_TAG, new Bundle());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //ViewHelper.removeMagicButtons(videoRoot);
     }
 
     @Override
@@ -192,14 +190,16 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
                     mPlayer = MediaPlayer.create(c, R.raw.small);
                 }
                 mPlayer.setDisplay(mSurfaceHolder);
-                if (!TextUtils.isEmpty(subtitlesUri)) {
-                    subtitleView.setPlayer(mPlayer);
-                    // Replace with actual subs file
-                    // .srt file https://en.wikipedia.org/wiki/SubRip
-                    // Sample srt file download link https://tinyurl.com/ybsz3gw3
-                    subtitleView.setSubSourceFromFile(subtitlesUri, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
-                } else {
-                    // set subtitles from raw file or no subtitles
+                if (shouldUseSubtitles()) {
+                    if (!TextUtils.isEmpty(subtitlesUri)) {
+                        subtitleView.setPlayer(mPlayer);
+                        // Replace with actual subs file
+                        // .srt file https://en.wikipedia.org/wiki/SubRip
+                        // Sample srt file download link https://tinyurl.com/ybsz3gw3
+                        subtitleView.setSubSourceFromFile(subtitlesUri, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+                    } else {
+                        // set subtitles from raw file or no subtitles
+                    }
                 }
                 mPlayer.setLooping(false);
                 mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -242,7 +242,6 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
             mPosition = 0;
         }
 
-
         public String openVideo() {
             final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
             final String localUriString = preferences.getString("localURIForVideo", null);
@@ -253,6 +252,11 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
             final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
             final String localUriString = preferences.getString("localURIForSubtitles", null);
             return localUriString;
+        }
+
+        public boolean shouldUseSubtitles() {
+            final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
+            return preferences.getBoolean("useSubtitles", false);
         }
     }
 }
