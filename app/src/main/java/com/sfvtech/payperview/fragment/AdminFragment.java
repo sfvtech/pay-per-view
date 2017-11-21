@@ -52,6 +52,8 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
     private int nViewers = 0;
     private int MAX_VIEWERS = 0;
     private String fragmentTag;
+    private String savedEmail;
+    private String savedName;
 
     public AdminFragment() {
         // Required empty public constructor
@@ -75,6 +77,12 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
         }
         if (getArguments().containsKey("fragmentTag")) {
             fragmentTag = getArguments().getString("fragmentTag");
+        }
+        if (getArguments().containsKey("savedEmail")) {
+            savedName = getArguments().getString("savedName");
+        }
+        if (getArguments().containsKey("savedEmail")) {
+            savedEmail = getArguments().getString("savedEmail");
         }
 
         final TextView installationIdView = (TextView) v.findViewById(R.id.installationIdValue);
@@ -208,6 +216,8 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 break;
             case ViewerInfoFragment.FRAGMENT_TAG:
                 final Fragment viewerInfoFragment = new ViewerInfoFragment();
+                args.putString("savedEmail", savedEmail);
+                args.putString("savedName", savedName);
                 viewerInfoFragment.setArguments(args);
                 ((AppCompatActivity) getContext()).getSupportFragmentManager().
                         beginTransaction().replace(R.id.container, viewerInfoFragment, ViewerInfoFragment.FRAGMENT_TAG).
