@@ -5,6 +5,7 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:fontFamily">"sans-serif-condensed"</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="TitleText">
@@ -61,8 +62,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:background">@android:drawable/dialog_holo_dark_frame</item>
         <item name="android:layout_margin">10dp</item>
-        <item name="android:padding">20dp</item>
-        <item name="android:textSize">36sp</item>
+        <item name="android:padding">18dp</item>
+        <item name="android:textSize">34sp</item>
     </style>
 
     <style name="TableCell">

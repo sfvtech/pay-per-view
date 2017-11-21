@@ -46,6 +46,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
     private EditText subtitlesURL;
     private Button downloadVideoButton;
     private Button downloadSubtitlesButton;
+    private Button openPreferencesButton;
     private TextView subtitlesStatus;
     private TextView videoStatus;
     private ArrayList<Viewer> mViewers = new ArrayList<Viewer>();
@@ -108,6 +109,9 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
 
         editViewersButton = (Button) v.findViewById(R.id.adminEditViewers);
         editViewersButton.setOnClickListener(this);
+
+        openPreferencesButton = v.findViewById(R.id.openPref);
+        openPreferencesButton.setOnClickListener(this);
 
         if (fragmentTag.equals(ViewerNumberFragment.FRAGMENT_TAG) || fragmentTag.equals(ViewerInfoFragment.FRAGMENT_TAG) || fragmentTag.equals(VideoFragment.FRAGMENT_TAG)) {
             editViewersButton.setVisibility(View.GONE);
@@ -180,6 +184,13 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
             case R.id.adminChangeViewerNumber3:
                 nViewers = 3;
                 handleCancel();
+                break;
+            case R.id.openPref:
+                final Fragment prefFragment = new PreferenceFragment();
+                ((AppCompatActivity) getContext()).getSupportFragmentManager().
+                        beginTransaction().replace(R.id.container, prefFragment, PreferenceFragment.FRAGMENT_TAG).
+                        addToBackStack(this.fragmentTag).
+                        commit();
                 break;
 
         }
