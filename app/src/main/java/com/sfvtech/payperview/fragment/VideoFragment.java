@@ -187,7 +187,7 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
                         e.printStackTrace();
                     }
                 } else {
-                    mPlayer = MediaPlayer.create(c, R.raw.small);
+                    mPlayer = MediaPlayer.create(c, R.raw.video);
                 }
                 mPlayer.setDisplay(mSurfaceHolder);
                 if (shouldUseSubtitles()) {
@@ -245,7 +245,8 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
         public String openVideo() {
             final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
             final String localUriString = preferences.getString("localURIForVideo", null);
-            return localUriString;
+            return "file:///storage/emulated/0/Download/video.mp4";
+            // return localUriString;
         }
 
         public String getSubtitles() {

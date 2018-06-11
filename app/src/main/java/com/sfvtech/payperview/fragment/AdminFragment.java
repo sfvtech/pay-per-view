@@ -1,15 +1,20 @@
 package com.sfvtech.payperview.fragment;
 
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -55,6 +60,9 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
     private String fragmentTag;
     private String savedEmail;
     private String savedName;
+
+    private String downloadUrl;
+    private String downloadFileName;
 
     public AdminFragment() {
         // Required empty public constructor
@@ -165,11 +173,11 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.download_video:
                 final String urlForVideo = videoURL.getText().toString().trim();
-                queueDownload(urlForVideo, "video");
+                download(urlForVideo, "video");
                 break;
             case R.id.download_subtitles:
                 final String urlForSubtitles = subtitlesURL.getText().toString().trim();
-                queueDownload(urlForSubtitles, "subtitles");
+                download(urlForSubtitles, "subtitles");
                 break;
             case R.id.adminEditViewers:
                 final Fragment editViewersFragment = EditViewersFragment.create(mViewers, nViewers, fragmentTag);
@@ -260,11 +268,37 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
                 commit();
     }
 
+    private void download(String URL, String videoOrSubtitles) {
+        final String fileName = videoOrSubtitles.equals("video") ? "video.mp4" : "subtitles.srt";
+
+        downloadUrl = URL;
+        downloadFileName = fileName;
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                queueDownload(downloadUrl, downloadFileName);
+            } else {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+        } else {
+            // don't need to worry about perms below api level 23
+            queueDownload(downloadUrl, downloadFileName);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            queueDownload(downloadUrl, downloadFileName);
+        }
+    }
+
     /**
      * Use Android's Download Manager to queue this download.
      */
-    private void queueDownload(String URL, String videoOrSubtitles) {
-        final String fileName = videoOrSubtitles.equals("video") ? "video.mp4" : "subtitles.srt";
+    private void queueDownload(String URL, String fileName) {
         try {
             if (URL != null && !URL.isEmpty()) {
                 Uri uri = Uri.parse(URL);
