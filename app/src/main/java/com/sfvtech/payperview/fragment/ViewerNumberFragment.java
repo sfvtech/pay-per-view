@@ -50,7 +50,6 @@ public class ViewerNumberFragment extends Fragment implements View.OnClickListen
 
         // Event Listeners
         mOneButton.setOnClickListener(this);
-        mOneButton.setOnClickListener(this);
         mTwoButton.setOnClickListener(this);
         mThreeButton.setOnClickListener(this);
         mLanguageSelector.setOnClickListener(new View.OnClickListener() {

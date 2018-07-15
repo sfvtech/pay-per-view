@@ -70,9 +70,9 @@
     <string name="server_status_online" translatable="false">Online</string>
     <string name="upload_button" translatable="false">Upload</string>
 
-    <string name="upload_endpoint_url" translatable="false">UPLOAD_ENPOINT_URL</string>
-    <string name="secret_key" translatable="false">SECRET_KEY</string>
-    <string name="secret_value" translatable="false">SECRET_VALUE</string>
+    <string name="upload_endpoint_url" translatable="false">upload_endpoint_url</string>
+    <string name="secret_key" translatable="false">secret_key</string>
+    <string name="secret_value" translatable="false">secret_value</string>
     <string name="installationIdLabel" translatable="false">Installation Id</string>
     <string name="installationIdValue" translatable="false">None</string>
     <string name="versionLabel" translatable="false">Version</string>
