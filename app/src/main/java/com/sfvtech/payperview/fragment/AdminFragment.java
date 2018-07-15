@@ -49,6 +49,7 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
     private Button openPreferencesButton;
     private TextView subtitlesStatus;
     private TextView videoStatus;
+    OnRestartCalledListener mCallback;
     private ArrayList<Viewer> mViewers = new ArrayList<Viewer>();
     private int nViewers = 0;
     private int MAX_VIEWERS = 0;
@@ -58,6 +59,17 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
 
     public AdminFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnRestartCalledListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnViewerNumberSelectedListener");
+        }
     }
 
     @Override
@@ -251,13 +263,12 @@ public class AdminFragment extends Fragment implements View.OnClickListener {
 
     private void restart() {
         Log.v(AdminFragment.FRAGMENT_TAG, "Restart Called");
-        final Fragment viewerNumberFragment = new ViewerNumberFragment();
-        final Bundle restartArgs = new Bundle();
-        restartArgs.putParcelableArrayList("mViewers", new ArrayList<Viewer>());
-        viewerNumberFragment.setArguments(restartArgs);
-        ((AppCompatActivity) getContext()).getSupportFragmentManager().
-                beginTransaction().replace(R.id.container, viewerNumberFragment, ViewerNumberFragment.FRAGMENT_TAG).
-                commit();
+        mCallback.onRestartCalled();
+    }
+
+    // Container Activity must implement this interface
+    public interface OnRestartCalledListener {
+        void onRestartCalled();
     }
 
     /**

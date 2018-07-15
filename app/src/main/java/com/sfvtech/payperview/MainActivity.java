@@ -24,6 +24,7 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.sfvtech.payperview.database.DatabaseHelper;
+import com.sfvtech.payperview.fragment.AdminFragment;
 import com.sfvtech.payperview.fragment.EditViewersFragment;
 import com.sfvtech.payperview.fragment.SurveyFragment;
 import com.sfvtech.payperview.fragment.ThankYouFragment;
@@ -37,7 +38,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity implements ViewerNumberFragment.OnViewerNumberSelectedListener,
         ViewerInfoFragment.OnViewerInfoSubmittedListener, VideoFragment.OnVideoFinishedListener,
         SurveyFragment.OnSurveyFinishedListener, ThankYouFragment.OnSessionFinishedListener,
-        EditViewersFragment.onEditViewersFinishedListener {
+        EditViewersFragment.onEditViewersFinishedListener, AdminFragment.OnRestartCalledListener {
 
     public static final String LOG_TAG = "MainActivity";
     public static final int MY_PERMISSION_REQUEST_LOCATION = 100;
@@ -354,6 +355,11 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+    }
+
+    @Override
+    public void onRestartCalled() {
+        onSessionFinished();
     }
 
     private class myLocationlistener implements LocationListener {
