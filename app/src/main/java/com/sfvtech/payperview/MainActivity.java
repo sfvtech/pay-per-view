@@ -82,11 +82,12 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
                         Log.v("Tag: downloadstatus", "" + downloadStatus);
                         Log.v("Tag: uriString", uriString);
                         if ((downloadStatus == DownloadManager.STATUS_SUCCESSFUL)) {
+                            Log.v("Download successful", "file extension "+ fileExtension);
                             final SharedPreferences preferences = getSharedPreferences("preferences", Context.MODE_PRIVATE);
-                            if (fileExtension.equals(".mp4")) {
+                            if (fileExtension.equals("mp4")) {
                                 preferences.edit().putString("localURIForVideo", uriString).apply();
                                 Log.v("TAG download local URI", uriString);
-                            } else {
+                            } else if (fileExtension.equals("srt")) {
                                 preferences.edit().putString("localURIForSubtitles", uriString).apply();
                             }
                         }
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements ViewerNumberFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // Trying to trigger database update
         final SQLiteDatabase database = new DatabaseHelper(this).getWritableDatabase();
         database.close();
