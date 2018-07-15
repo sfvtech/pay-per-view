@@ -23,6 +23,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
@@ -44,6 +46,9 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
     public static final int MY_PERMISSION_REQUEST_STORAGE = 101;
     private final String LOG_TAG = "DataUploadActivity";
+    private String mUploadUrl;
+    private String mUploadSecretKey;
+    private String mUploadSecretValue;
     long mRecordsToUpload = 0;
     boolean mIsClientOnline = false;
     boolean mIsServerResponsive = false;
@@ -74,8 +79,13 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         emailButton = findViewById(R.id.emailButton);
         emailButton.setOnClickListener(this);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mUploadUrl = preferences.getString(getString(R.string.upload_endpoint_url), "");
+        mUploadSecretKey = preferences.getString(getString(R.string.secret_key), "");
+        mUploadSecretValue = preferences.getString(getString(R.string.secret_value), "");
+
         // See if we can resolve the upload endpoint
-        new CheckServerStatus().execute(getString(R.string.upload_endpoint_url));
+        new CheckServerStatus().execute(mUploadUrl);
     }
 
     @Override
@@ -107,7 +117,7 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
     public void uploadData(View view) {
         String csv = getNewRecordsAsCsv();
-        new PostData().execute(getString(R.string.upload_endpoint_url), csv);
+        new PostData().execute(mUploadUrl, csv);
     }
 
     public Uri prepareCSVForEmail() {
@@ -327,7 +337,7 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
                 urlConnection.setRequestMethod("POST");
 
                 Uri.Builder builder = new Uri.Builder()
-                        .appendQueryParameter("sandwich", "fudge pickle") // @todo devise better security :)
+                        .appendQueryParameter(mUploadSecretKey, mUploadSecretValue) // @todo devise better security :)
                         .appendQueryParameter("installation_id", installationId)
                         .appendQueryParameter("data", data)
                         .appendQueryParameter("version", Integer.toString(getApplicationVersionNumber()));

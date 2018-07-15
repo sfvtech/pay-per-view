@@ -36,9 +36,11 @@
     <string name="survey_option_five_label">7</string>
     <string name="survey_option_five_value">all</string>
 
+    <string name="correct_email_confirmation">%1$s, ¿es este tu correo electrónico correcto?</string>
+    <string name="yes">Sí</string>
+
     <!-- ThankYouActivity -->
     <string name="thank_you_title">Gracias! Ha terminado.</string>
     <string name="thank_you_message">Encuentre un voluntario para recoger el $1.</string>
-
 
 </resources>
