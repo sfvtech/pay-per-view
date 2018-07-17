@@ -23,10 +23,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.sfvtech.payperview.database.DatabaseContract;
 import com.sfvtech.payperview.database.DatabaseHelper;
 import com.sfvtech.payperview.fragment.AdminFragment;
+
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,6 +48,9 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
     public static final int MY_PERMISSION_REQUEST_STORAGE = 101;
     private final String LOG_TAG = "DataUploadActivity";
+    private String mUploadUrl;
+    private String mUploadSecretKey;
+    private String mUploadSecretValue;
     long mRecordsToUpload = 0;
     boolean mIsClientOnline = false;
     boolean mIsServerResponsive = false;
@@ -74,8 +81,13 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         emailButton = findViewById(R.id.emailButton);
         emailButton.setOnClickListener(this);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mUploadUrl = preferences.getString(getString(R.string.upload_endpoint_url), "");
+        mUploadSecretKey = preferences.getString(getString(R.string.secret_key), "");
+        mUploadSecretValue = preferences.getString(getString(R.string.secret_value), "");
+
         // See if we can resolve the upload endpoint
-        new CheckServerStatus().execute(getString(R.string.upload_endpoint_url));
+        new CheckServerStatus().execute(mUploadUrl);
     }
 
     @Override
@@ -107,7 +119,7 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
     public void uploadData(View view) {
         String csv = getNewRecordsAsCsv();
-        new PostData().execute(getString(R.string.upload_endpoint_url), csv);
+        new PostData().execute(mUploadUrl, csv);
     }
 
     public Uri prepareCSVForEmail() {
@@ -238,18 +250,31 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
         finish();
     }
 
+    private JSONObject getDataAsJson(String installation_id, String data, String versionName) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("installation_id", installation_id);
+            jsonObject.put("data", data);
+            jsonObject.put("version", versionName);
+        } catch (Exception ex) {
+            Toast.makeText(this, "Unable to prepared data for upload", Toast.LENGTH_SHORT).show();
+            return new JSONObject();
+        }
+        return jsonObject;
+    }
+
     /**
      * @return Integer the version number of the application
      */
-    public int getApplicationVersionNumber() {
+    public String getApplicationVersionName() {
         PackageInfo info;
         try {
             PackageManager manager = getApplication().getPackageManager();
             info = manager.getPackageInfo(
                     getApplication().getPackageName(), 0);
-            return info.versionCode;
+            return info.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            return 0;
+            return "unknown";
         }
     }
 
@@ -318,26 +343,27 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
 
             String installationId = getIntent().getExtras().getString(AdminFragment.EXTRA_INSTALLATION_ID);
 
+            Uri.Builder builder = Uri.parse(url).buildUpon();
+            builder.appendQueryParameter(getString(R.string.secret_key), mUploadSecretKey);
+            builder.appendQueryParameter(getString(R.string.secret_value), mUploadSecretValue);
+            Uri uri = builder.build();
+
             try {
-                URL urlObj = new URL(url);
+                URL urlObj = new URL(uri.toString());
                 HttpURLConnection urlConnection = (HttpURLConnection) urlObj.openConnection();
                 urlConnection.setReadTimeout(10000); // 10 seconds
                 urlConnection.setConnectTimeout(15000); // 15 seconds
                 urlConnection.setDoOutput(true);
+                urlConnection.setRequestProperty("Content-Type", "application/json");
                 urlConnection.setRequestMethod("POST");
 
-                Uri.Builder builder = new Uri.Builder()
-                        .appendQueryParameter("sandwich", "fudge pickle") // @todo devise better security :)
-                        .appendQueryParameter("installation_id", installationId)
-                        .appendQueryParameter("data", data)
-                        .appendQueryParameter("version", Integer.toString(getApplicationVersionNumber()));
-                String query = builder.build().getEncodedQuery();
+                JSONObject body = getDataAsJson(installationId, data,getApplicationVersionName());
 
                 OutputStream os = urlConnection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(os, "UTF-8")
                 );
-                writer.write(query);
+                writer.write(body.toString());
                 writer.flush();
                 writer.close();
                 int response = urlConnection.getResponseCode();
