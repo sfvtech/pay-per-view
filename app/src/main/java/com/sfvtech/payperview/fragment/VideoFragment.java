@@ -244,9 +244,11 @@ public class VideoFragment extends Fragment implements SurfaceHolder.Callback, V
 
         public String openVideo() {
             final SharedPreferences preferences = getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
-            final String localUriString = preferences.getString("localURIForVideo", null);
-            return "file:///storage/emulated/0/Download/video.mp4";
-            // return localUriString;
+            // Earlier installations of the app used a hack that depended on a video.mp4 file in the
+            // Downloads directory. Let's not make those devices reconfigure and download the file.
+            // @todo it would be nice to ensure that Download/video.mp4 exists before defaulting to it
+            final String localUriString = preferences.getString("localURIForVideo", "file:///storage/emulated/0/Download/video.mp4");
+            return localUriString;
         }
 
         public String getSubtitles() {
