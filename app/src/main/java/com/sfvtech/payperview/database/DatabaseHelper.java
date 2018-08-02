@@ -95,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String selectQuery = "SELECT " +
                 "S." + DatabaseContract.SessionEntry._ID + ", " +
-                "V." + DatabaseContract.ViewerEntry.COLUMN_SESSION_ID + ", " +
+                "V." + DatabaseContract.ViewerEntry._ID + ", " +
                 "V." + DatabaseContract.ViewerEntry.COLUMN_NAME + ", " +
                 "V." + DatabaseContract.ViewerEntry.COLUMN_EMAIL + ", " +
                 "V." + DatabaseContract.ViewerEntry.COLUMN_SURVEY_ANSWER + ", " +

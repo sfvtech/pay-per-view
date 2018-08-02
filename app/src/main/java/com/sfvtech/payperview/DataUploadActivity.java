@@ -344,8 +344,7 @@ public class DataUploadActivity extends Activity implements View.OnClickListener
             String installationId = getIntent().getExtras().getString(AdminFragment.EXTRA_INSTALLATION_ID);
 
             Uri.Builder builder = Uri.parse(url).buildUpon();
-            builder.appendQueryParameter(getString(R.string.secret_key), mUploadSecretKey);
-            builder.appendQueryParameter(getString(R.string.secret_value), mUploadSecretValue);
+            builder.appendQueryParameter(mUploadSecretKey, mUploadSecretValue);
             Uri uri = builder.build();
 
             try {
